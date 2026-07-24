@@ -6,6 +6,7 @@ PORT="${PORT:-8765}"
 TRANSCRIBE_PORT="${TRANSCRIBE_PORT:-8766}"
 TS=""
 PY=""
+TRANSCRIBER_RESTART=0
 
 if command -v tailscale >/dev/null 2>&1; then
   TS="$(command -v tailscale)"
@@ -66,10 +67,44 @@ TRANSCRIBE_PORT=$TRANSCRIBE_PORT
 ALLOWED_ORIGINS=https://amirferjani.github.io,http://127.0.0.1:$PORT,http://localhost:$PORT
 ENV
   chmod 600 .env
+  [[ -n "$OPENAI_KEY" ]] && TRANSCRIBER_RESTART=1
 else
   grep -q '^OPENAI_TRANSCRIBE_MODEL=' .env || echo 'OPENAI_TRANSCRIBE_MODEL=gpt-4o-transcribe' >> .env
   grep -q '^OPENAI_TRANSCRIBE_LANGUAGE=' .env || echo 'OPENAI_TRANSCRIBE_LANGUAGE=nl' >> .env
   grep -q '^TRANSCRIBE_PORT=' .env || echo "TRANSCRIBE_PORT=$TRANSCRIBE_PORT" >> .env
+  CURRENT_KEY="$(sed -n 's/^OPENAI_API_KEY=//p' .env | tail -1)"
+  if [[ -z "$CURRENT_KEY" ]]; then
+    echo
+    echo "De nauwkeurige Nederlandse transcriptie is nog niet geactiveerd."
+    read "ENABLE_TRANSCRIBE?Nu een OpenAI API-sleutel toevoegen? [j/N]: "
+    ENABLE_TRANSCRIBE="${ENABLE_TRANSCRIBE:l}"
+    if [[ "$ENABLE_TRANSCRIBE" == "j" || "$ENABLE_TRANSCRIBE" == "ja" || "$ENABLE_TRANSCRIBE" == "y" || "$ENABLE_TRANSCRIBE" == "yes" ]]; then
+      read -s "OPENAI_KEY?OpenAI API-sleutel (alleen lokaal bewaard): "
+      echo
+      if [[ -n "$OPENAI_KEY" ]]; then
+        OPENAI_KEY="$OPENAI_KEY" "$PY" - <<'PY'
+from pathlib import Path
+import os
+path = Path('.env')
+lines = path.read_text('utf-8').splitlines()
+key = os.environ['OPENAI_KEY']
+found = False
+result = []
+for line in lines:
+    if line.startswith('OPENAI_API_KEY='):
+        result.append('OPENAI_API_KEY=' + key)
+        found = True
+    else:
+        result.append(line)
+if not found:
+    result.append('OPENAI_API_KEY=' + key)
+path.write_text('\n'.join(result) + '\n', encoding='utf-8')
+PY
+        chmod 600 .env
+        TRANSCRIBER_RESTART=1
+      fi
+    fi
+  fi
 fi
 
 if [[ -f .server.pid ]] && kill -0 "$(cat .server.pid)" 2>/dev/null; then
@@ -80,6 +115,11 @@ else
   sleep 1
 fi
 
+if (( TRANSCRIBER_RESTART )) && [[ -f .transcriber.pid ]]; then
+  kill "$(cat .transcriber.pid)" 2>/dev/null || true
+  rm -f .transcriber.pid
+  sleep 1
+fi
 if [[ -f .transcriber.pid ]] && kill -0 "$(cat .transcriber.pid)" 2>/dev/null; then
   echo "De Nederlandse transcriptieserver draait al met PID $(cat .transcriber.pid)."
 else
