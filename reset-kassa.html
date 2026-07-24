@@ -4,11 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#0a1020">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <title>Registratiekassa herstellen</title>
-  <style>html,body{margin:0;min-height:100%;background:#07101b;color:#fff;font-family:system-ui,-apple-system,sans-serif}main{min-height:100vh;display:grid;place-items:center;padding:28px;text-align:center}div{max-width:520px}h1{font-size:28px}p{color:#b8c4d9;line-height:1.5}</style>
+  <style>html,body{margin:0;min-height:100%;background:#07101b;color:#fff;font-family:system-ui,-apple-system,sans-serif}main{min-height:100dvh;display:grid;place-items:center;padding:calc(env(safe-area-inset-top,0px) + 28px) 28px calc(env(safe-area-inset-bottom,0px) + 28px);text-align:center}div{max-width:520px}h1{font-size:28px}p{color:#b8c4d9;line-height:1.5}</style>
 </head>
 <body>
-<main><div><h1>Registratiekassa wordt hersteld…</h1><p>De oude Safari-cache wordt verwijderd. Je wordt automatisch doorgestuurd.</p></div></main>
+<main><div><h1>Registratiekassa wordt vernieuwd…</h1><p>De oude Apple- en Safari-cache wordt verwijderd. Je wordt automatisch naar de nieuwste versie gestuurd.</p></div></main>
 <script>
 (async()=>{
   try{
@@ -21,7 +22,7 @@
       await Promise.all(keys.filter(key=>key.startsWith('registratiekassa-')).map(key=>caches.delete(key)));
     }
   }catch(error){console.warn(error);}
-  location.replace('./?fresh=safari-fix-20260724-2');
+  location.replace('./?fresh=apple-dutch-v15');
 })();
 </script>
 </body>
