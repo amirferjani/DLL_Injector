@@ -1,0 +1,23 @@
+/* Snelle aantallen + duidelijke verbindingsstatus. */
+.ticket-row.rk-double-ready{grid-template-columns:auto auto minmax(0,1fr) auto auto auto!important;transition:background-color .18s ease,box-shadow .18s ease}
+.ticket-row.rk-double-ready [data-quick-add]{cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+.ticket-row.rk-quick-plus{background:rgba(53,199,127,.16)!important;box-shadow:inset 3px 0 #56dda0}
+.ticket-row.rk-quick-minus{background:rgba(255,178,66,.14)!important;box-shadow:inset 3px 0 #ffc66d}
+.rk-line-actions{display:flex;align-items:center;justify-content:flex-end;gap:6px;min-width:max-content}
+.rk-minus-button,.rk-line-actions .remove-item{display:grid;place-items:center;width:38px;height:38px;min-width:38px;border-radius:10px;border:1px solid rgba(255,255,255,.12);font-size:20px;font-weight:900;line-height:1;touch-action:manipulation}
+.rk-minus-button{background:#182640;color:#ffd27e}
+.rk-minus-button:hover,.rk-minus-button:focus-visible{border-color:#ffd27e;background:#263653;color:#fff}
+.rk-line-actions .remove-item{position:static!important;inset:auto!important;margin:0!important}
+.server-button[data-connection-state]{position:relative;padding-left:25px!important;white-space:nowrap}
+.server-button[data-connection-state]::before{content:'';position:absolute;left:10px;top:50%;width:8px;height:8px;border-radius:50%;transform:translateY(-50%);background:#718099;box-shadow:0 0 0 3px rgba(113,128,153,.12)}
+.server-button.rk-connection-online::before{background:#55dda0;box-shadow:0 0 0 3px rgba(85,221,160,.16)}
+.server-button.rk-connection-pending::before{background:#ffd06b;box-shadow:0 0 0 3px rgba(255,208,107,.16);animation:rk-connection-pulse 1.2s infinite}
+.server-button.rk-connection-offline::before{background:#ff7b8d;box-shadow:0 0 0 3px rgba(255,123,141,.15)}
+.server-button.rk-connection-conflict::before{background:#ff9d52;box-shadow:0 0 0 3px rgba(255,157,82,.18);animation:rk-connection-pulse .9s infinite}
+@keyframes rk-connection-pulse{50%{opacity:.35;transform:translateY(-50%) scale(.78)}}
+@media(max-width:560px){
+  .rk-minus-button,.rk-line-actions .remove-item{width:42px;height:42px;min-width:42px}
+  .ticket-row{column-gap:7px!important}
+  .server-button[data-connection-state]{padding-left:23px!important;font-size:11px!important}
+  .server-button[data-connection-state]::before{left:8px}
+}
