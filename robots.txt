@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /
+
+# Deze webapp is alleen bedoeld voor mensen die de exacte link kennen.
