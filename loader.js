@@ -1,4 +1,9 @@
 (async()=>{
+  const robots=document.createElement('meta');
+  robots.name='robots';
+  robots.content='noindex,nofollow,noarchive,nosnippet,noimageindex';
+  document.head.appendChild(robots);
+
   const fetchText=async path=>{
     const response=await fetch(path,{cache:'no-store'});
     if(!response.ok) throw new Error(`Kon ${path} niet laden (${response.status})`);
