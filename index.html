@@ -51,7 +51,7 @@
         </button>
         <button id="serverButton" class="soft-button server-button" title="Gedeelde Tailscale-server instellen">Server instellen</button>
         <button id="catalogAdminButton" class="soft-button hidden">Kaartbeheer</button>
-        <button id="auditButton" class="soft-button hidden">Logboek</button>
+        <button id="auditButton" class="soft-button hidden" title="Baascentrum, historie en rapporten">Baascentrum</button>
         <button id="installButton" class="soft-button hidden">Installeer app</button>
         <button id="userButton" class="user-chip"><span id="userInitial">A</span><strong id="userName">Amir</strong></button>
       </div>
@@ -184,10 +184,70 @@
     </form>
   </dialog>
 
-  <dialog id="auditDialog" class="dialog-card wide-dialog audit-dialog">
+  <dialog id="auditDialog" class="dialog-card wide-dialog audit-dialog boss-center-dialog">
     <form method="dialog">
-      <div class="dialog-head"><div><p class="eyebrow">BAASOMGEVING</p><h3>Auditlogboek</h3></div><button value="cancel" class="icon-close">×</button></div>
-      <div id="auditList" class="audit-list"></div>
+      <div class="dialog-head"><div><p class="eyebrow">BAASOMGEVING</p><h3>Baascentrum</h3><p id="auditStorageStatus" class="muted compact">Append-only logboek</p></div><button value="cancel" class="icon-close">×</button></div>
+      <nav class="boss-tabs" aria-label="Baascentrum">
+        <button type="button" class="active" data-boss-tab="activity">Activiteit</button>
+        <button type="button" data-boss-tab="deleted">Verwijderd</button>
+        <button type="button" data-boss-tab="orders">Rekeningen</button>
+        <button type="button" data-boss-tab="shifts">Shifts</button>
+        <button type="button" data-boss-tab="close">Dagafsluiting</button>
+        <button type="button" data-boss-tab="reports">Rapporten</button>
+      </nav>
+
+      <section class="boss-panel" data-boss-panel="activity">
+        <div class="audit-toolbar">
+          <label>Vanaf<input id="auditFrom" type="date"></label>
+          <label>Tot<input id="auditTo" type="date"></label>
+          <label>Medewerker<select id="auditStaffFilter"></select></label>
+          <label>Tafel<select id="auditTableFilter"></select></label>
+          <label>Actie<select id="auditActionFilter"></select></label>
+          <label>Apparaat<select id="auditDeviceFilter"></select></label>
+          <label class="audit-search-field">Zoeken<input id="auditSearch" type="search" placeholder="Product, rekening, medewerker…"></label>
+          <div class="audit-toolbar-actions"><button id="auditResetFilters" type="button" class="soft-button">Wis filters</button><button id="auditExportButton" type="button" class="soft-button">Exporteer CSV</button></div>
+        </div>
+        <div class="audit-status-row"><span id="auditResultCount">0 gebeurtenissen</span><span>Klik op een rekening of op een item in de bestelling voor de volledige geschiedenis.</span></div>
+        <div id="auditSummary" class="audit-summary"></div>
+        <div class="audit-layout"><div id="auditOrderList" class="audit-order-list"></div><div id="auditList" class="audit-list"></div></div>
+      </section>
+
+      <section class="boss-panel hidden" data-boss-panel="deleted">
+        <div class="audit-status-row"><strong>Verwijderde producten en rekeningen</strong><span>De gebeurtenissen blijven zichtbaar nadat een regel of rekening verdwenen is.</span></div>
+        <div id="auditDeletedList" class="audit-list"></div>
+      </section>
+
+      <section class="boss-panel hidden" data-boss-panel="orders">
+        <div class="boss-section-head"><div><p class="eyebrow">REKENINGHISTORIE</p><h4>Open en betaalde rekeningen</h4></div></div>
+        <div id="bossOrdersList" class="boss-orders-list"></div>
+      </section>
+
+      <section class="boss-panel hidden" data-boss-panel="shifts">
+        <div class="boss-section-head"><div><p class="eyebrow">PERSONEEL</p><h4>Shifts</h4></div><div class="boss-section-actions"><button id="shiftStartButton" type="button" class="primary-small">Start shift</button><button id="shiftEndButton" type="button" class="soft-button">Beëindig shift</button></div></div>
+        <div id="bossShiftList" class="boss-shift-list"></div>
+      </section>
+
+      <section class="boss-panel hidden" data-boss-panel="close">
+        <div class="boss-section-head"><div><p class="eyebrow">DAGOVERZICHT</p><h4>Dagafsluiting</h4></div><div class="boss-section-actions"><input id="dayCloseDate" type="date"><button id="dayCloseCreateButton" type="button" class="primary-small">Maak afsluiting</button></div></div>
+        <div id="dayCloseList" class="day-close-list"></div>
+      </section>
+
+      <section class="boss-panel hidden" data-boss-panel="reports">
+        <div class="boss-section-head"><div><p class="eyebrow">ANALYSE</p><h4>Omzet en producten</h4></div></div>
+        <div id="bossReports"></div>
+      </section>
+
+      <button value="cancel" class="soft-button full">Sluiten</button>
+    </form>
+  </dialog>
+
+  <dialog id="historyDialog" class="dialog-card wide-dialog history-dialog">
+    <form method="dialog">
+      <div class="dialog-head"><div><p class="eyebrow">VOLLEDIGE GESCHIEDENIS</p><h3 id="historyTitle">Bestellingsregel</h3><p id="historySubtitle" class="muted compact"></p></div><button value="cancel" class="icon-close">×</button></div>
+      <div class="history-dialog-content">
+        <div id="historySummary" class="history-summary"></div>
+        <div id="historyTimeline" class="history-timeline"></div>
+      </div>
       <button value="cancel" class="soft-button full">Sluiten</button>
     </form>
   </dialog>
