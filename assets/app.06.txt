@@ -71,6 +71,7 @@
     $('moveTableButton').addEventListener('click', openMoveDialog);
     $('voiceButton').addEventListener('click', toggleVoice);
     $('voiceTopButton').addEventListener('click', toggleVoice);
+    $('serverButton').addEventListener('click', configureAiServer);
     document.querySelectorAll('[data-method]').forEach(button => button.addEventListener('click', event => {
       event.preventDefault();
       completePayment(button.dataset.method);
@@ -91,10 +92,13 @@
   }
 
   function init() {
+    const queryServer = normalizeServerUrl(new URLSearchParams(location.search).get('server'));
+    if (queryServer) storageSet('local', AI_SERVER_KEY, queryServer);
     renderLogin();
     bindEvents();
     initSplitter();
     restoreSession();
+    refreshServerButton();
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
 
