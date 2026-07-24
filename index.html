@@ -10,6 +10,7 @@
   <title>Registratiekassa · Café De Zoo</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icons/icon.svg">
+  <style>.server-button.connected{border-color:rgba(63,213,152,.48);color:#8ff0c5}@media(max-width:720px){.top-actions .server-button{display:inline-grid!important;width:42px;padding:0;font-size:0;place-items:center}.server-button:before{content:"AI";font-size:10px;font-weight:950}}</style>
 </head>
 <body>
   <div id="loginGate" class="login-gate">
@@ -41,6 +42,7 @@
       </nav>
       <div class="top-actions">
         <button id="voiceTopButton" class="mic-button" aria-pressed="false"><span class="mic-dot"></span><span class="mic-label">Spraak</span></button>
+        <button id="serverButton" class="soft-button server-button" title="AI-server instellen">AI-server</button>
         <button id="installButton" class="soft-button hidden">Installeer app</button>
         <button id="userButton" class="user-chip"><span id="userInitial">A</span><strong id="userName">Amir</strong></button>
       </div>
