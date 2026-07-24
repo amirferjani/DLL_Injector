@@ -1,0 +1,102 @@
+      }
+    };
+    instance.onend = () => {
+      clearTimeout(restartVoiceTimer);
+      if (voiceActive) {
+        restartVoiceTimer = setTimeout(() => {
+          try { instance.start(); } catch {}
+        }, 250);
+      } else updateVoiceUi(false, 'Spraak uit');
+    };
+    return instance;
+  }
+
+  function updateVoiceUi(listening, label) {
+    $('voiceButton').textContent = listening ? 'Stop microfoon' : 'Start microfoon';
+    $('voiceStateText').textContent = label;
+    $('voiceTopButton').classList.toggle('listening', listening);
+    $('voiceTopButton').setAttribute('aria-pressed', String(listening));
+    document.querySelector('.voice-live-bar')?.classList.toggle('listening', listening);
+  }
+
+  function toggleVoice() {
+    if (!selectedTableId) {
+      applyLayout('floor');
+      return showToast('Kies eerst een tafel.');
+    }
+    if (!recognition) recognition = configureRecognition();
+    if (!recognition) return showToast('Deze browser ondersteunt geen live spraakherkenning. Gebruik Safari of Chrome met HTTPS.');
+    voiceActive = !voiceActive;
+    if (voiceActive) {
+      voiceIgnored.clear();
+      try { recognition.start(); } catch {}
+    } else {
+      clearTimeout(restartVoiceTimer);
+      try { recognition.stop(); } catch {}
+      voiceInterim = [];
+      voiceIgnored.clear();
+      renderVoiceDraft();
+      updateVoiceUi(false, 'Spraak uit');
+    }
+  }
+
+  function renderAll() {
+    renderFloor();
+    renderOrder();
+  }
+
+  function bindEvents() {
+    $('bossLoginButton').addEventListener('click', () => $('bossPinWrap').classList.toggle('hidden'));
+    $('bossPinSubmit').addEventListener('click', () => {
+      if ($('bossPin').value === '0607') startSession({id:'boss',name:'Baas',color:'#ff5aa5'}, 'boss');
+      else $('loginError').textContent = 'Verkeerde PIN.';
+    });
+    $('bossPin').addEventListener('keydown', event => { if (event.key === 'Enter') $('bossPinSubmit').click(); });
+    $('userButton').addEventListener('click', () => {
+      if (!confirm('Afmelden en een andere medewerker kiezen?')) return;
+      storageRemove('session', 'registratiekassa-session');
+      location.reload();
+    });
+    document.querySelectorAll('[data-layout]').forEach(button => button.addEventListener('click', () => applyLayout(button.dataset.layout)));
+    document.querySelectorAll('[data-catalog]').forEach(button => button.addEventListener('click', () => {
+      catalogMode = button.dataset.catalog;
+      selectedCategory = 'Alles';
+      document.querySelectorAll('[data-catalog]').forEach(x => x.classList.toggle('active', x === button));
+      renderCatalog();
+    }));
+    $('productSearch').addEventListener('input', renderCatalog);
+    $('sendButton').addEventListener('click', sendOrder);
+    $('payButton').addEventListener('click', openPayment);
+    $('backFloorButton').addEventListener('click', () => applyLayout('floor'));
+    $('moveTableButton').addEventListener('click', openMoveDialog);
+    $('voiceButton').addEventListener('click', toggleVoice);
+    $('voiceTopButton').addEventListener('click', toggleVoice);
+    document.querySelectorAll('[data-method]').forEach(button => button.addEventListener('click', event => {
+      event.preventDefault();
+      completePayment(button.dataset.method);
+    }));
+    window.addEventListener('beforeinstallprompt', event => {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+      $('installButton').classList.remove('hidden');
+    });
+    $('installButton').addEventListener('click', async () => {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      $('installButton').classList.add('hidden');
+    });
+    window.addEventListener('resize', () => renderFloor());
+  }
+
+  function init() {
+    renderLogin();
+    bindEvents();
+    initSplitter();
+    restoreSession();
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+
+  init();
+})();

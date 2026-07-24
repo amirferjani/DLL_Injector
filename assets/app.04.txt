@@ -1,0 +1,124 @@
+    const total = orderTotal(order);
+    $('ticketCount').textContent = `${count} ${count === 1 ? 'item' : 'items'}`;
+    $('ticketTotal').textContent = money(total);
+    $('payTotal').textContent = money(total);
+    $('sendButton').disabled = !items.some(item => (item.sentQty || 0) < item.qty);
+    $('payButton').disabled = !items.length;
+
+    if (!items.length) {
+      $('ticketList').innerHTML = '<div class="ticket-empty">Nog niets toegevoegd.<br>Gebruik producttegels of de microfoon.</div>';
+      return;
+    }
+    $('ticketList').innerHTML = items.map(item => {
+      const product = getProduct(item.productId);
+      const sent = Math.min(item.sentQty || 0, item.qty);
+      const status = sent >= item.qty ? 'Besteld' : sent ? `${sent} besteld · ${item.qty-sent} nieuw` : 'Nieuw';
+      return `<div class="ticket-row">
+        <button class="qty-button" data-minus="${item.productId}">−</button>
+        <div><strong>${item.qty} × ${product?.name || item.productId}</strong><small>${status} · ${money(product?.price || 0)} per stuk</small></div>
+        <span class="ticket-price">${money((product?.price || 0) * item.qty)}</span>
+        <button class="remove-item" data-remove="${item.productId}" aria-label="Verwijder ${product?.name || ''}">×</button>
+      </div>`;
+    }).join('');
+    document.querySelectorAll('[data-minus]').forEach(button => button.addEventListener('click', () => changeQuantity(button.dataset.minus, -1)));
+    document.querySelectorAll('[data-remove]').forEach(button => button.addEventListener('click', () => removeProduct(button.dataset.remove)));
+  }
+
+  function sendOrder() {
+    const order = orderFor(selectedTableId);
+    if (!order) return;
+    let changed = 0;
+    order.items.forEach(item => {
+      if ((item.sentQty || 0) < item.qty) changed += item.qty - (item.sentQty || 0);
+      item.sentQty = item.qty;
+    });
+    saveState();
+    renderAll();
+    showToast(`${changed} nieuwe ${changed === 1 ? 'drank' : 'items'} besteld.`);
+  }
+
+  function openPayment() {
+    const order = orderFor(selectedTableId);
+    if (!order || !activeItems(order).length) return;
+    $('paymentTitle').textContent = `Tafel ${tableDef(selectedTableId)?.label || selectedTableId}`;
+    $('paymentAmount').textContent = money(orderTotal(order));
+    $('paymentDialog').showModal();
+  }
+
+  function completePayment(method) {
+    const order = orderFor(selectedTableId);
+    if (!order) return;
+    state.payments.unshift({id:uid(), tableId:selectedTableId, staffId:session.id, method, amount:orderTotal(order), items:clone(activeItems(order)), paidAt:Date.now()});
+    delete state.orders[selectedTableId];
+    saveState();
+    $('paymentDialog').close();
+    showToast(`Betaling via ${method} geregistreerd.`);
+    renderAll();
+  }
+
+  function openMoveDialog() {
+    const sourceOrder = orderFor(selectedTableId);
+    if (!sourceOrder) return;
+    $('moveTargets').innerHTML = TABLES.map(table => {
+      const occupied = Boolean(orderFor(table.id) && activeItems(orderFor(table.id)).length);
+      return `<button type="button" class="move-target" data-move-target="${table.id}" ${table.id === selectedTableId ? 'disabled' : ''}>${table.zone === 'terrace' ? 'Terras ' : 'Tafel '}${table.label}${occupied ? '<br><small>wordt samengevoegd</small>' : ''}</button>`;
+    }).join('');
+    document.querySelectorAll('[data-move-target]').forEach(button => button.addEventListener('click', () => moveOrder(button.dataset.moveTarget)));
+    $('moveDialog').showModal();
+  }
+
+  function moveOrder(targetId) {
+    const sourceId = selectedTableId;
+    const source = orderFor(sourceId);
+    if (!source || sourceId === targetId) return;
+    const target = orderFor(targetId);
+    if (target) {
+      source.items.forEach(sourceItem => {
+        const match = target.items.find(item => item.productId === sourceItem.productId);
+        if (match) {
+          match.qty += sourceItem.qty;
+          match.sentQty = (match.sentQty || 0) + (sourceItem.sentQty || 0);
+        } else target.items.push(clone(sourceItem));
+      });
+      target.openedAt = Math.min(target.openedAt, source.openedAt);
+    } else {
+      state.orders[targetId] = {...source, tableId:targetId};
+    }
+    delete state.orders[sourceId];
+    selectedTableId = targetId;
+    saveState();
+    $('moveDialog').close();
+    renderAll();
+    showToast(`Rekening verplaatst naar ${tableDef(targetId)?.label || targetId}.`);
+  }
+
+  function applyLayout(layout) {
+    const allowed = ['split','floor','order'];
+    if (!allowed.includes(layout)) layout = 'split';
+    state.layout = layout;
+    saveState();
+    $('workspace').classList.remove('layout-split','layout-floor','layout-order');
+    $('workspace').classList.add(`layout-${layout}`);
+    document.querySelectorAll('[data-layout]').forEach(button => button.classList.toggle('active', button.dataset.layout === layout));
+    if (layout === 'order' && !selectedTableId) showToast('Kies eerst een tafel op de plattegrond.');
+  }
+
+  function initSplitter() {
+    const splitter = $('splitter');
+    let dragging = false;
+    const stored = Number(storageGet('local', 'registratiekassa-floor-width'));
+    if (stored >= 28 && stored <= 72) document.documentElement.style.setProperty('--floor-width', `${stored}%`);
+    splitter.addEventListener('pointerdown', event => {
+      if (window.innerWidth <= 1120) return;
+      dragging = true;
+      splitter.classList.add('dragging');
+      splitter.setPointerCapture(event.pointerId);
+    });
+    splitter.addEventListener('pointermove', event => {
+      if (!dragging) return;
+      const rect = $('workspace').getBoundingClientRect();
+      const percent = Math.max(28, Math.min(72, ((event.clientX - rect.left) / rect.width) * 100));
+      document.documentElement.style.setProperty('--floor-width', `${percent}%`);
+      storageSet('local', 'registratiekassa-floor-width', String(percent));
+    });
+    const stop = () => { dragging = false; splitter.classList.remove('dragging'); };

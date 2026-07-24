@@ -1,0 +1,85 @@
+(() => {
+  'use strict';
+
+  const $ = (id) => document.getElementById(id);
+  const money = (value) => new Intl.NumberFormat('nl-BE', {style:'currency', currency:'EUR'}).format(value || 0);
+  const uid = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
+  const clone = (value) => JSON.parse(JSON.stringify(value));
+
+  const memoryStorage = new Map();
+  function browserStorage(kind) {
+    try { return kind === 'session' ? globalThis.sessionStorage : globalThis.localStorage; }
+    catch { return null; }
+  }
+  function storageGet(kind, key) {
+    const storage = browserStorage(kind);
+    try { return storage?.getItem(key) ?? memoryStorage.get(`${kind}:${key}`) ?? null; }
+    catch { return memoryStorage.get(`${kind}:${key}`) ?? null; }
+  }
+  function storageSet(kind, key, value) {
+    const text = String(value);
+    const storage = browserStorage(kind);
+    try { if (storage) storage.setItem(key, text); else memoryStorage.set(`${kind}:${key}`, text); }
+    catch { memoryStorage.set(`${kind}:${key}`, text); }
+  }
+  function storageRemove(kind, key) {
+    const storage = browserStorage(kind);
+    try { storage?.removeItem(key); }
+    catch {}
+    memoryStorage.delete(`${kind}:${key}`);
+  }
+
+  const STAFF = [
+    {id:'amir', name:'Amir', color:'#6389ff'},
+    {id:'montassar', name:'Montassar', color:'#e48c55'},
+    {id:'team-1', name:'Medewerker 1', color:'#6bbf8f'},
+    {id:'team-2', name:'Medewerker 2', color:'#d17bb1'},
+    {id:'bar', name:'Bar', color:'#b18ae5'}
+  ];
+
+  const CATEGORY_COLORS = {
+    'Favorieten':'#ffd56c', 'Frisdranken':'#61a2ff', 'Bieren':'#f0b45a', 'Wijnen':'#d77891',
+    'Koffie & thee':'#a77b5f', 'Cocktails':'#ff6cae', 'Mocktails':'#6ad5bd', 'Shots':'#b992ff', 'Snacks':'#82bd65'
+  };
+
+  const PRODUCTS = [
+    {id:'cola',name:'Coca-Cola',price:3.2,category:'Frisdranken',favorite:true,aliases:['cola','coca cola','coke']},
+    {id:'cola-zero',name:'Coca-Cola Zero',price:3.2,category:'Frisdranken',favorite:true,aliases:['cola zero','coca cola zero','zero cola']},
+    {id:'water-plat',name:'Eaulala Plat',price:3.2,category:'Frisdranken',favorite:true,aliases:['water','plat water','water plat','plat']},
+    {id:'water-bruis',name:'Eaulala Bruis',price:3.2,category:'Frisdranken',favorite:true,aliases:['bruiswater','bruis water','spuitwater','water bruis','bruis']},
+    {id:'fanta',name:'Fanta Orange',price:3.2,category:'Frisdranken',favorite:false,aliases:['fanta','fanta orange']},
+    {id:'sprite',name:'Sprite',price:3.2,category:'Frisdranken',favorite:false,aliases:['sprite']},
+    {id:'tonic',name:'Tonic',price:3.2,category:'Frisdranken',favorite:false,aliases:['tonic']},
+    {id:'ice-tea',name:'Ice Tea',price:3.4,category:'Frisdranken',favorite:false,aliases:['ice tea','ijsthee']},
+
+    {id:'pils',name:'Pils',price:3.2,category:'Bieren',favorite:true,aliases:['pils','pintje','pint','stella']},
+    {id:'duvel',name:'Duvel',price:4.8,category:'Bieren',favorite:true,aliases:['duvel']},
+    {id:'karmeliet',name:'Tripel Karmeliet',price:4.9,category:'Bieren',favorite:true,aliases:['karmeliet','tripel karmeliet']},
+    {id:'leffe',name:'Leffe Blond',price:4.5,category:'Bieren',favorite:false,aliases:['leffe','leffe blond']},
+    {id:'kriek',name:'Kriek',price:4.2,category:'Bieren',favorite:false,aliases:['kriek']},
+    {id:'hoegaarden',name:'Hoegaarden',price:4.2,category:'Bieren',favorite:false,aliases:['hoegaarden','witbier']},
+    {id:'orval',name:'Orval',price:5.0,category:'Bieren',favorite:false,aliases:['orval']},
+    {id:'carlsberg-0',name:'Carlsberg 0.0',price:3.8,category:'Bieren',favorite:false,aliases:['alcoholvrij bier','carlsberg zero','carlsberg nul']},
+
+    {id:'white-wine',name:'Witte wijn',price:5.5,category:'Wijnen',favorite:true,aliases:['witte wijn','wit wijntje','glas wit']},
+    {id:'red-wine',name:'Rode wijn',price:5.5,category:'Wijnen',favorite:true,aliases:['rode wijn','rood wijntje','glas rood']},
+    {id:'rose-wine',name:'Rosé',price:5.5,category:'Wijnen',favorite:false,aliases:['rose','rosé','rose wijn']},
+    {id:'cava',name:'Cava',price:6.5,category:'Wijnen',favorite:false,aliases:['cava','glas cava']},
+
+    {id:'coffee',name:'Koffie',price:3.2,category:'Koffie & thee',favorite:true,aliases:['koffie','coffee']},
+    {id:'espresso',name:'Espresso',price:3.0,category:'Koffie & thee',favorite:false,aliases:['espresso']},
+    {id:'cappuccino',name:'Cappuccino',price:3.8,category:'Koffie & thee',favorite:false,aliases:['cappuccino']},
+    {id:'latte',name:'Latte',price:4.0,category:'Koffie & thee',favorite:false,aliases:['latte','latte macchiato']},
+    {id:'tea',name:'Thee',price:3.2,category:'Koffie & thee',favorite:false,aliases:['thee','tea']},
+
+    {id:'aperol',name:'Aperol Spritz',price:11,category:'Cocktails',favorite:true,aliases:['aperol','aperol spritz']},
+    {id:'pornstar',name:'Pornstar Martini',price:13,category:'Cocktails',favorite:true,aliases:['pornstar','pornstar martini']},
+    {id:'mojito',name:'Mojito',price:12,category:'Cocktails',favorite:true,aliases:['mojito']},
+    {id:'espresso-martini',name:'Espresso Martini',price:13,category:'Cocktails',favorite:false,aliases:['espresso martini']},
+    {id:'moscow-mule',name:'Moscow Mule',price:12,category:'Cocktails',favorite:false,aliases:['moscow mule','mule']},
+    {id:'gin-tonic',name:'Gin-tonic',price:11.5,category:'Cocktails',favorite:true,aliases:['gin tonic','gin en tonic']},
+    {id:'negroni',name:'Negroni',price:13,category:'Cocktails',favorite:false,aliases:['negroni']},
+    {id:'margarita',name:'Margarita',price:12,category:'Cocktails',favorite:false,aliases:['margarita']},
+
+    {id:'virgin-mojito',name:'Virgin Mojito',price:8.5,category:'Mocktails',favorite:true,aliases:['virgin mojito','alcoholvrije mojito']},
+    {id:'virgin-spritz',name:'Virgin Spritz',price:8.5,category:'Mocktails',favorite:false,aliases:['virgin spritz','alcoholvrije spritz']},

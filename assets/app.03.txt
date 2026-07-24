@@ -1,0 +1,139 @@
+    $('userInitial').style.background = person.color || '#6389ff';
+    applyLayout(state.layout || 'split');
+    renderAll();
+  }
+
+  function restoreSession() {
+    try {
+      const saved = JSON.parse(storageGet('session', 'registratiekassa-session') || 'null');
+      if (saved?.id) startSession(saved, saved.role || 'team');
+    } catch {}
+  }
+
+  function renderFloor() {
+    const floor = $('floor');
+    floor.querySelectorAll('.table-button').forEach(node => node.remove());
+    TABLES.forEach(table => {
+      const order = orderFor(table.id);
+      const total = orderTotal(order);
+      const button = document.createElement('button');
+      button.className = `table-button ${table.shape}${selectedTableId === table.id ? ' selected' : ''}`;
+      button.dataset.status = tableStatus(table.id);
+      button.style.left = `${table.x}%`;
+      button.style.top = `${table.y}%`;
+      button.innerHTML = `<span>${table.label}</span>${total ? `<small>${money(total)}</small>` : ''}`;
+      button.title = `${table.zone === 'terrace' ? 'Terras' : 'Binnen'} · Tafel ${table.label}`;
+      button.addEventListener('click', () => selectTable(table.id));
+      floor.appendChild(button);
+    });
+  }
+
+  function selectTable(id) {
+    selectedTableId = id;
+    orderFor(id, true);
+    saveState();
+    renderAll();
+    if (window.innerWidth <= 1120) {
+      if ($('workspace').classList.contains('layout-floor')) applyLayout('split');
+      setTimeout(() => $('orderPanel').scrollIntoView({behavior:'smooth', block:'start'}), 50);
+    }
+  }
+
+  function renderOrder() {
+    const order = selectedTableId ? orderFor(selectedTableId) : null;
+    const hasTable = Boolean(order);
+    $('noTable').classList.toggle('hidden', hasTable);
+    $('orderContent').classList.toggle('hidden', !hasTable);
+    if (!hasTable) return;
+
+    const table = tableDef(selectedTableId);
+    $('selectedTableTitle').textContent = `${table?.zone === 'terrace' ? 'Terras' : 'Tafel'} ${table?.label || selectedTableId}`;
+    const staff = STAFF.find(p => p.id === order.staffId)?.name || session?.name || 'Team';
+    const mins = Math.max(0, Math.floor((Date.now() - order.openedAt) / 60000));
+    $('orderMeta').textContent = `${staff} · ${mins ? `${mins} min open` : 'net geopend'}`;
+    renderCatalog();
+    renderTicket();
+  }
+
+  function categoriesForCurrentMode() {
+    const visibleProducts = currentProductSet(false);
+    return ['Alles', ...new Set(visibleProducts.map(p => p.category))];
+  }
+
+  function currentProductSet(applyCategory = true) {
+    let products = PRODUCTS.slice();
+    if (catalogMode === 'favorites') products = products.filter(p => p.favorite);
+    if (catalogMode === 'recent') {
+      products = state.recent.map(id => getProduct(id)).filter(Boolean);
+    }
+    const query = $('productSearch')?.value.trim().toLocaleLowerCase('nl-BE') || '';
+    if (query) products = products.filter(p => `${p.name} ${p.category}`.toLocaleLowerCase('nl-BE').includes(query));
+    if (applyCategory && selectedCategory !== 'Alles') products = products.filter(p => p.category === selectedCategory);
+    return products;
+  }
+
+  function renderCatalog() {
+    const categories = categoriesForCurrentMode();
+    if (!categories.includes(selectedCategory)) selectedCategory = 'Alles';
+    $('categoryRail').innerHTML = categories.map(category => `
+      <button class="category-button${selectedCategory === category ? ' active' : ''}" data-category="${category}" style="--category-color:${CATEGORY_COLORS[category] || '#7286a8'}">${category}</button>
+    `).join('');
+    document.querySelectorAll('[data-category]').forEach(button => button.addEventListener('click', () => {
+      selectedCategory = button.dataset.category;
+      renderCatalog();
+    }));
+
+    const products = currentProductSet(true);
+    $('productGrid').innerHTML = products.length ? products.map(product => `
+      <button class="product-tile" data-product="${product.id}" style="--tile:${CATEGORY_COLORS[product.category] || '#6389ff'}">
+        ${product.favorite ? '<i>★</i>' : ''}<strong>${product.name}</strong><span>${money(product.price)}</span>
+      </button>`).join('') : '<div class="ticket-empty">Geen producten gevonden.</div>';
+    document.querySelectorAll('[data-product]').forEach(button => button.addEventListener('click', () => addProduct(button.dataset.product, 1)));
+  }
+
+  function addProduct(productId, qty = 1, source = 'touch') {
+    if (!selectedTableId) return showToast('Selecteer eerst een tafel.');
+    const order = orderFor(selectedTableId, true);
+    let item = order.items.find(row => row.productId === productId);
+    if (!item) {
+      item = {productId, qty:0, sentQty:0, addedAt:Date.now()};
+      order.items.push(item);
+    }
+    item.qty += Math.max(1, qty);
+    item.lastSource = source;
+    state.recent = [productId, ...state.recent.filter(id => id !== productId)].slice(0,18);
+    saveState();
+    renderAll();
+  }
+
+  function changeQuantity(productId, delta) {
+    const order = orderFor(selectedTableId);
+    if (!order) return;
+    const item = order.items.find(row => row.productId === productId);
+    if (!item) return;
+    item.qty += delta;
+    if (item.qty <= 0) order.items = order.items.filter(row => row !== item);
+    else item.sentQty = Math.min(item.sentQty || 0, item.qty);
+    cleanupEmptyOrder(selectedTableId);
+    saveState();
+    renderAll();
+  }
+
+  function removeProduct(productId) {
+    const order = orderFor(selectedTableId);
+    if (!order) return;
+    order.items = order.items.filter(item => item.productId !== productId);
+    cleanupEmptyOrder(selectedTableId);
+    saveState();
+    renderAll();
+  }
+
+  function cleanupEmptyOrder(tableId) {
+    const order = orderFor(tableId);
+    if (order && !activeItems(order).length) delete state.orders[tableId];
+  }
+
+  function renderTicket() {
+    const order = orderFor(selectedTableId);
+    const items = activeItems(order);
+    const count = items.reduce((sum,item) => sum + item.qty, 0);

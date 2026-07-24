@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0a1020">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Registratiekassa">
+  <title>Registratiekassa · Café De Zoo</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon.svg">
+</head>
+<body>
+  <div id="loginGate" class="login-gate">
+    <div class="login-card">
+      <div class="brand-mark">ZOO</div>
+      <p class="eyebrow">REGISTRATIEKASSA</p>
+      <h1>Wie werkt er?</h1>
+      <p class="muted">Kies je naam. De bestelling en tafelstatus worden op dit toestel bewaard.</p>
+      <div id="staffGrid" class="staff-grid"></div>
+      <button id="bossLoginButton" class="text-button">Baasomgeving openen</button>
+      <div id="bossPinWrap" class="boss-pin hidden">
+        <input id="bossPin" inputmode="numeric" maxlength="4" placeholder="PIN">
+        <button id="bossPinSubmit" class="primary-small">Open</button>
+      </div>
+      <p id="loginError" class="error-text"></p>
+    </div>
+  </div>
+
+  <div id="app" class="app hidden">
+    <header class="topbar">
+      <div class="brand-row">
+        <div class="brand-mark small">Z</div>
+        <div><p class="eyebrow">CAFÉ DE ZOO</p><h2>Registratiekassa</h2></div>
+      </div>
+      <nav class="view-switcher" aria-label="Werkweergave">
+        <button class="view-switch active" data-layout="split">Beide</button>
+        <button class="view-switch" data-layout="floor">Plattegrond</button>
+        <button class="view-switch" data-layout="order">Bestellen</button>
+      </nav>
+      <div class="top-actions">
+        <button id="voiceTopButton" class="mic-button" aria-pressed="false"><span class="mic-dot"></span><span class="mic-label">Spraak</span></button>
+        <button id="installButton" class="soft-button hidden">Installeer app</button>
+        <button id="userButton" class="user-chip"><span id="userInitial">A</span><strong id="userName">Amir</strong></button>
+      </div>
+    </header>
+
+    <main id="workspace" class="workspace layout-split">
+      <section id="floorPanel" class="panel floor-panel">
+        <div class="panel-header">
+          <div><p class="eyebrow">BENEDEN + TERRAS</p><h3>Plattegrond</h3></div>
+          <div class="legend"><span><i class="status-dot free"></i>Vrij</span><span><i class="status-dot active"></i>Actief</span><span><i class="status-dot sent"></i>Besteld</span></div>
+        </div>
+        <div id="floorViewport" class="floor-viewport">
+          <div id="floor" class="floor-canvas">
+            <div class="terrace-zone"><span>TERRAS · BUITEN</span></div>
+            <div class="venue-boundary"><span>GEVEL / INGANG CAFÉ</span></div>
+            <div class="bar-zone"><div class="bar-lights"></div><strong>BAR · ZOO</strong></div>
+            <div class="inside-label">BINNEN</div>
+          </div>
+        </div>
+      </section>
+
+      <div id="splitter" class="splitter" role="separator" aria-label="Versleep om panelen breder of smaller te maken" aria-orientation="vertical" tabindex="0"><span></span></div>
+
+      <section id="orderPanel" class="panel order-panel">
+        <div id="noTable" class="empty-state">
+          <div class="empty-icon">⌖</div><h3>Kies eerst een tafel</h3><p>Selecteer een tafel op de plattegrond of gebruik bovenaan de knop Plattegrond.</p>
+        </div>
+        <div id="orderContent" class="order-content hidden">
+          <div class="order-head">
+            <div><p class="eyebrow">ACTIEVE REKENING</p><h3 id="selectedTableTitle">Tafel 1</h3><p id="orderMeta" class="muted compact">Amir · net geopend</p></div>
+            <div class="order-head-actions"><button id="backFloorButton" class="soft-button">Plattegrond</button><button id="moveTableButton" class="soft-button">Verplaats</button></div>
+          </div>
+          <div class="voice-live-bar">
+            <div><span id="voiceStateDot" class="voice-state-dot"></span><strong id="voiceStateText">Spraak uit</strong><small id="voiceTranscript">Zeg bijvoorbeeld: “twee cola, een water en een pintje”.</small></div>
+            <button id="voiceButton" class="voice-action">Start microfoon</button>
+          </div>
+          <div class="catalog-tabs">
+            <button class="catalog-tab active" data-catalog="favorites">Favorieten</button><button class="catalog-tab" data-catalog="all">Alle producten</button><button class="catalog-tab" data-catalog="recent">Recent</button>
+            <label class="product-search"><span>⌕</span><input id="productSearch" type="search" placeholder="Zoek product"></label>
+          </div>
+          <div class="order-main"><aside id="categoryRail" class="category-rail"></aside><section id="productGrid" class="product-grid"></section></div>
+          <div class="ticket-section">
+            <div class="ticket-header"><div><p class="eyebrow">REKENING</p><strong id="ticketCount">0 items</strong></div><strong id="ticketTotal">€ 0,00</strong></div>
+            <div id="voiceDraft" class="voice-draft hidden"></div><div id="ticketList" class="ticket-list"></div>
+          </div>
+          <div class="checkout-bar"><button id="sendButton" class="checkout-button send"><span>Nieuwe items</span><strong>Bestellen</strong></button><button id="payButton" class="checkout-button pay"><span>Openstaand</span><strong id="payTotal">€ 0,00</strong></button></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="paymentDialog" class="dialog-card">
+    <form method="dialog">
+      <div class="dialog-head"><div><p class="eyebrow">BETALING</p><h3 id="paymentTitle">Tafel 1</h3></div><button value="cancel" class="icon-close">×</button></div>
+      <p id="paymentAmount" class="payment-amount">€ 0,00</p>
+      <div class="payment-methods"><button value="cash" data-method="Cash">Cash</button><button value="card" data-method="Kaart">Kaart</button><button value="other" data-method="Andere">Andere</button></div>
+      <button value="cancel" class="soft-button full">Annuleren</button>
+    </form>
+  </dialog>
+  <dialog id="moveDialog" class="dialog-card wide-dialog">
+    <form method="dialog">
+      <div class="dialog-head"><div><p class="eyebrow">TAFEL VERPLAATSEN</p><h3>Kies een doeltafel</h3></div><button value="cancel" class="icon-close">×</button></div>
+      <div id="moveTargets" class="move-targets"></div><button value="cancel" class="soft-button full">Annuleren</button>
+    </form>
+  </dialog>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="loader.js" defer></script>
+</body>
+</html>

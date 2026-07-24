@@ -1,0 +1,126 @@
+    splitter.addEventListener('pointerup', stop);
+    splitter.addEventListener('pointercancel', stop);
+    splitter.addEventListener('keydown', event => {
+      if (!['ArrowLeft','ArrowRight'].includes(event.key)) return;
+      event.preventDefault();
+      const current = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--floor-width')) || 48;
+      const next = Math.max(28, Math.min(72, current + (event.key === 'ArrowRight' ? 3 : -3)));
+      document.documentElement.style.setProperty('--floor-width', `${next}%`);
+      storageSet('local', 'registratiekassa-floor-width', String(next));
+    });
+  }
+
+  const numberWords = {een:1,'één':1,twee:2,drie:3,vier:4,vijf:5,zes:6,zeven:7,acht:8,negen:9,tien:10};
+  const aliasIndex = PRODUCTS.flatMap(product => product.aliases.map(alias => ({productId:product.id, alias:normalize(alias)}))).sort((a,b) => b.alias.length - a.alias.length);
+
+  function normalize(text) {
+    return String(text || '').toLocaleLowerCase('nl-BE').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[’']/g,' ').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+  }
+
+  function escapeRegExp(value) { return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+  function quantityBefore(text, start) {
+    const before = text.slice(0,start).trim().split(/\s+/).slice(-2);
+    const last = before[before.length-1] || '';
+    const previous = before[before.length-2] || '';
+    if (/^\d+$/.test(last)) return Math.max(1, Math.min(25, Number(last)));
+    if (numberWords[last]) return numberWords[last];
+    if ((last === 'keer' || last === 'maal') && (/^\d+$/.test(previous) || numberWords[previous])) return Number(previous) || numberWords[previous];
+    return 1;
+  }
+
+  function parseVoiceProducts(rawText) {
+    let text = normalize(rawText);
+    const correction = text.match(/(?:ik )?bedoel\s+(.+)$/);
+    if (correction) text = correction[1];
+    const occupied = [];
+    const quantities = new Map();
+    aliasIndex.forEach(entry => {
+      const pattern = new RegExp(`\\b${escapeRegExp(entry.alias).replace(/\\ /g,'\\s+')}\\b`, 'g');
+      let match;
+      while ((match = pattern.exec(text))) {
+        const start = match.index, end = start + match[0].length;
+        if (occupied.some(span => start < span.end && end > span.start)) continue;
+        occupied.push({start,end});
+        quantities.set(entry.productId, (quantities.get(entry.productId) || 0) + quantityBefore(text,start));
+      }
+    });
+    return [...quantities.entries()].map(([productId,qty]) => ({productId,qty}));
+  }
+
+  function parseRemoval(rawText) {
+    const text = normalize(rawText);
+    if (!/(verwijder|haal|wis|geen|weg)/.test(text)) return [];
+    return parseVoiceProducts(text).map(item => item.productId);
+  }
+
+  function handleFinalVoiceTranscript(transcript) {
+    $('voiceTranscript').textContent = transcript;
+    const removals = parseRemoval(transcript);
+    if (removals.length) {
+      removals.forEach(productId => removeOneVoiceProduct(productId));
+      voiceInterim = [];
+      voiceIgnored.clear();
+      renderVoiceDraft();
+      return;
+    }
+    const parsed = parseVoiceProducts(transcript).filter(item => !voiceIgnored.has(item.productId));
+    parsed.forEach(item => addProduct(item.productId, item.qty, 'voice'));
+    if (parsed.length) showToast(`${parsed.reduce((n,item)=>n+item.qty,0)} item(s) via spraak toegevoegd.`);
+    voiceInterim = [];
+    voiceIgnored.clear();
+    renderVoiceDraft();
+  }
+
+  function removeOneVoiceProduct(productId) {
+    const order = orderFor(selectedTableId);
+    const item = order?.items.find(row => row.productId === productId);
+    if (!item) return showToast(`${getProduct(productId)?.name || 'Product'} stond niet op de rekening.`);
+    item.qty -= 1;
+    if (item.qty <= 0) order.items = order.items.filter(row => row !== item);
+    else item.sentQty = Math.min(item.sentQty || 0, item.qty);
+    cleanupEmptyOrder(selectedTableId);
+    saveState();
+    renderAll();
+    showToast(`${getProduct(productId)?.name} verwijderd.`);
+  }
+
+  function renderVoiceDraft() {
+    const visible = voiceInterim.filter(item => !voiceIgnored.has(item.productId));
+    $('voiceDraft').classList.toggle('hidden', !visible.length);
+    $('voiceDraft').innerHTML = visible.map(item => `<span class="voice-draft-item">${item.qty} × ${getProduct(item.productId)?.name}<button data-ignore-voice="${item.productId}" aria-label="Niet toevoegen">×</button></span>`).join('');
+    document.querySelectorAll('[data-ignore-voice]').forEach(button => button.addEventListener('click', () => {
+      voiceIgnored.add(button.dataset.ignoreVoice);
+      renderVoiceDraft();
+    }));
+  }
+
+  function configureRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return null;
+    const instance = new SpeechRecognition();
+    instance.lang = 'nl-BE';
+    instance.continuous = true;
+    instance.interimResults = true;
+    instance.maxAlternatives = 1;
+    instance.onstart = () => updateVoiceUi(true, 'Ik luister…');
+    instance.onresult = event => {
+      let interimText = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const text = event.results[i][0].transcript.trim();
+        if (event.results[i].isFinal) handleFinalVoiceTranscript(text);
+        else interimText += `${text} `;
+      }
+      if (interimText.trim()) {
+        $('voiceTranscript').textContent = interimText.trim();
+        voiceInterim = parseVoiceProducts(interimText);
+        renderVoiceDraft();
+      }
+    };
+    instance.onerror = event => {
+      if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+        voiceActive = false;
+        updateVoiceUi(false, 'Microfoon geweigerd');
+        showToast('Geef de website microfoontoegang in Safari of Chrome.');
+      } else if (event.error !== 'no-speech' && event.error !== 'aborted') {
+        showToast(`Spraakfout: ${event.error}`);

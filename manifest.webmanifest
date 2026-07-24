@@ -1,0 +1,1 @@
+{"name":"Registratiekassa · Café De Zoo","short_name":"Kassa Zoo","description":"Offline-first registratiekassa met tafelplan en live spraakinvoer.","start_url":"./","scope":"./","display":"standalone","background_color":"#07101b","theme_color":"#0a1020","orientation":"any","icons":[{"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}
