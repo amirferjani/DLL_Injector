@@ -1,4 +1,4 @@
-const CACHE='registratiekassa-zoo-v5';
+const CACHE='registratiekassa-zoo-v6';
 const FILES=['./','./index.html','./loader.js','./manifest.webmanifest','./icons/icon.svg','./assets/app.js.gz.b64','./assets/styles.css.gz.b64'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
