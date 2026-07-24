@@ -54,4 +54,4 @@ jobs:
           git commit -m "Record v18 real-browser test results" || exit 0
           git push origin HEAD:analysis/materialized-source-2026-07-25
 
-# Retry 6: explicitly make the intercepted test server unavailable while offline.
+# Retry 7: match a table with a restored total and ignore expected offline console errors.
