@@ -31,7 +31,13 @@ Deze checklist bewaart de opdrachten uit de volledige chat. Flowchart wordt niet
 - 33 tafels, terras T1–T8, gevel-/ingangslijn en gelijke uitlijning van tafels 3–9.
 - Drie weergaveknoppen en versleepbare desktopverdeling.
 - Tablet- en telefoonlayout met verticale workflow.
-- Basale tafelstatussen, producttegels, rekening, bestellen, betalen, rekening verplaatsen en samenvoegen.
+- Tafelstatussen wit, blauw en roze voor vrij, open en rekening gevraagd.
+- Oranje knipperende doeltafels tijdens het verplaatsen van een rekening of productlijnen.
+- Producttegels, rekening, bestellen, betalen, volledige rekening verplaatsen en rekeningen samenvoegen.
+- Eén of meerdere geselecteerde productlijnen verplaatsen of verwijderen.
+- Hoeveelheid wijzigen door op het aantal te drukken.
+- Naar links swipen per productlijn voor Verplaats of Verwijder.
+- Basis-auditlogboek voor de baas met medewerker, tijdstip, apparaat-ID en actie.
 - Lokale offline opslag en installeerbare PWA.
 - Live Nederlandstalige browser-spraakherkenning met voorlopige productchips en kruisjes.
 - Lokale parser voor aantallen, correcties en verwijderen.
@@ -52,11 +58,8 @@ Deze checklist bewaart de opdrachten uit de volledige chat. Flowchart wordt niet
 
 - Publieke GitHub Pages-link: repository staat nog privé en Pages is niet als publicatiesource bevestigd.
 - Volledige kaart van ongeveer 260 producten en baas-interface voor kaart-/prijsbeheer.
-- Exacte roze status “rekening gevraagd” en oranje knipperende verplaatsdoelen.
-- Eén of meerdere geselecteerde productlijnen verplaatsen.
-- Hoeveelheid bewerken via tik op aantal en swipe-acties per lijn.
 - Multi-user conflictwaarschuwingen.
-- Baasdashboard, volledig auditlogboek, shifts, rapporten, dagafsluiting en uitgebreide deelbetalingen.
+- Uitgebreid baasdashboard, centraal append-only auditlogboek, shifts, rapporten, dagafsluiting en uitgebreide deelbetalingen.
 - IndexedDB-operatiewachtrij en echte realtime multi-device synchronisatie.
 - Centrale SQLite/WAL-database, append-only log, sessietokens, device registration en automatische back-ups.
 - Het lokale serverpakket werkelijk installeren en starten op Amirs Mac.
