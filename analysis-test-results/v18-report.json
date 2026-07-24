@@ -1,5 +1,5 @@
 {
-  "startedAt": "2026-07-24T22:39:18.571Z",
+  "startedAt": "2026-07-24T22:41:50.286Z",
   "passed": false,
   "checks": [
     {
@@ -11,15 +11,20 @@
       "name": "Testserver wordt als online weergegeven",
       "ok": true,
       "details": ""
+    },
+    {
+      "name": "Product kan normaal toegevoegd worden",
+      "ok": true,
+      "details": ""
     }
   ],
   "browserErrors": [],
   "fakeServer": {
-    "syncCalls": 0,
-    "acceptedMutations": 0,
-    "acceptedAudits": 0,
+    "syncCalls": 3,
+    "acceptedMutations": 1,
+    "acceptedAudits": 1,
     "acceptedPayments": 0
   },
-  "finishedAt": "2026-07-24T22:39:49.112Z",
-  "failure": "locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('.product-tile').filter({ hasText: 'Aperol Spritz' }).first()\n    - locator resolved to <button data-product=\"p1\" class=\"product-tile\">…</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n    - element is visible, enabled and stable\n    - scrolling into view if needed\n    - done scrolling\n    - performing click action\n\n    at /home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v18.mjs:120:17"
+  "finishedAt": "2026-07-24T22:41:51.702Z",
+  "failure": "Error: Eén tik opent als Baas nog steeds productgeschiedenis\n    at check (file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v18.mjs:18:21)\n    at file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v18.mjs:128:3\n    at runNextTicks (node:internal/process/task_queues:60:5)\n    at process.processImmediate (node:internal/timers:454:9)\n    at process.callbackTrampoline (node:internal/async_hooks:130:17)"
 }

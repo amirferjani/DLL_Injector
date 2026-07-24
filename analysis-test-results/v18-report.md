@@ -3,16 +3,10 @@
 **Resultaat: MISLUKT**
 
 ```
-locator.click: Timeout 30000ms exceeded.
-Call log:
-  - waiting for locator('.product-tile').filter({ hasText: 'Aperol Spritz' }).first()
-    - locator resolved to <button data-product="p1" class="product-tile">…</button>
-  - attempting click action
-    - waiting for element to be visible, enabled and stable
-    - element is visible, enabled and stable
-    - scrolling into view if needed
-    - done scrolling
-    - performing click action
-
-    at /home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v18.mjs:120:17
+Error: Eén tik opent als Baas nog steeds productgeschiedenis
+    at check (file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v18.mjs:18:21)
+    at file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v18.mjs:128:3
+    at runNextTicks (node:internal/process/task_queues:60:5)
+    at process.processImmediate (node:internal/timers:454:9)
+    at process.callbackTrampoline (node:internal/async_hooks:130:17)
 ```
