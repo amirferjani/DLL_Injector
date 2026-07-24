@@ -1,4 +1,90 @@
 (async()=>{
+  const durableStore=(()=>{
+    const DB_NAME='registratiekassa-durable-v1';
+    const STORE_NAME='snapshots';
+    let dbPromise=null;
+    const timers=new Map();
+
+    const openDb=()=>{
+      if(!('indexedDB' in window)) return Promise.reject(new Error('IndexedDB niet beschikbaar'));
+      if(dbPromise) return dbPromise;
+      dbPromise=new Promise((resolve,reject)=>{
+        const request=indexedDB.open(DB_NAME,1);
+        request.onupgradeneeded=()=>{
+          const db=request.result;
+          if(!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME,{keyPath:'key'});
+        };
+        request.onsuccess=()=>resolve(request.result);
+        request.onerror=()=>reject(request.error||new Error('IndexedDB kon niet openen'));
+        request.onblocked=()=>reject(new Error('IndexedDB is geblokkeerd'));
+      }).catch(error=>{dbPromise=null;throw error;});
+      return dbPromise;
+    };
+
+    const read=async key=>{
+      const db=await openDb();
+      return new Promise((resolve,reject)=>{
+        const request=db.transaction(STORE_NAME,'readonly').objectStore(STORE_NAME).get(key);
+        request.onsuccess=()=>resolve(request.result||null);
+        request.onerror=()=>reject(request.error||new Error('Duurzame back-up kon niet gelezen worden'));
+      });
+    };
+
+    const write=async record=>{
+      const db=await openDb();
+      return new Promise((resolve,reject)=>{
+        const transaction=db.transaction(STORE_NAME,'readwrite');
+        transaction.objectStore(STORE_NAME).put(record);
+        transaction.oncomplete=()=>resolve(true);
+        transaction.onerror=()=>reject(transaction.error||new Error('Duurzame back-up kon niet opgeslagen worden'));
+        transaction.onabort=()=>reject(transaction.error||new Error('Duurzame back-up werd afgebroken'));
+      });
+    };
+
+    const clone=value=>{
+      try{return structuredClone(value);}catch{}
+      return JSON.parse(JSON.stringify(value));
+    };
+
+    return {
+      async restore(key){
+        try{
+          const local=localStorage.getItem(key);
+          if(local){
+            const parsed=JSON.parse(local);
+            if(parsed&&typeof parsed==='object') return false;
+          }
+        }catch{}
+        try{
+          const snapshot=await read(key);
+          if(!snapshot?.state) return false;
+          localStorage.setItem(key,JSON.stringify(snapshot.state));
+          return true;
+        }catch(error){
+          console.info('Geen duurzame kassaback-up hersteld.',error);
+          return false;
+        }
+      },
+      persist(key,state){
+        if(!key||!state) return Promise.resolve(false);
+        let snapshot;
+        try{snapshot=clone(state);}catch{return Promise.resolve(false);}
+        clearTimeout(timers.get(key));
+        return new Promise(resolve=>{
+          const timer=setTimeout(async()=>{
+            timers.delete(key);
+            try{await write({key,state:snapshot,updatedAt:Date.now()});resolve(true);}
+            catch(error){console.info('Duurzame kassaback-up uitgesteld.',error);resolve(false);}
+          },120);
+          timers.set(key,timer);
+        });
+      },
+      read
+    };
+  })();
+  window.__kassaDurableStore=durableStore;
+  await durableStore.restore('registratiekassa-zoo-v1');
+
   const fetchText=async path=>{
     const response=await fetch(path,{cache:'no-store'});
     if(!response.ok) throw new Error(`Kon ${path} niet laden (${response.status})`);
@@ -21,6 +107,15 @@
   ]);
   const [css,originalJs]=await Promise.all([unpack(cssB64),unpack(jsParts.join(''))]);
   let js=originalJs;
+
+  const patch=(label,before,after)=>{
+    if(!js.includes(before)){
+      console.warn(`Kassapatch niet toegepast: ${label}`);
+      return false;
+    }
+    js=js.replace(before,after);
+    return true;
+  };
 
   const catalogMatch=js.match(/const PRODUCTS = (\[.*?\]);\n/s);
   if(catalogMatch){
@@ -64,10 +159,10 @@
       .map(value => String(value||'').trim()).filter(value => value && value.length <= 80).slice(0,500);
   }
 `;
-  js=js.replace('  function escapeRegExp(value)',helpers+'\n  function escapeRegExp(value)');
-  js=js.replace('    let text = normalize(rawText);','    let text = normalizeVoiceText(rawText);');
-  js=js.replace("    const text = normalize(rawText);\n    if (!/(verwijder|haal|wis|geen|weg)/.test(text)) return [];","    const text = normalizeVoiceText(rawText);\n    if (!/(verwijder|haal|wis|geen|weg)/.test(text)) return [];");
-  js=js.replace("    return [...quantities.entries()].map(([productId,qty]) => ({productId,qty}));",`    const parsed = [...quantities.entries()].map(([productId,qty]) => ({productId,qty}));
+  patch('spraakhelpers','  function escapeRegExp(value)',helpers+'\n  function escapeRegExp(value)');
+  patch('spraaknormalisatie toevoegen','    let text = normalize(rawText);','    let text = normalizeVoiceText(rawText);');
+  patch('spraaknormalisatie verwijderen',"    const text = normalize(rawText);\n    if (!/(verwijder|haal|wis|geen|weg)/.test(text)) return [];","    const text = normalizeVoiceText(rawText);\n    if (!/(verwijder|haal|wis|geen|weg)/.test(text)) return [];");
+  patch('mixdrankaantallen',"    return [...quantities.entries()].map(([productId,qty]) => ({productId,qty}));",`    const parsed = [...quantities.entries()].map(([productId,qty]) => ({productId,qty}));
     const parsedById = new Map(parsed.map(item => [item.productId,item]));
     const amountPattern = '(?:een|één|twee|drie|vier|vijf|zes|zeven|acht|negen|tien|\\d+)';
     const comboRules = [
@@ -87,7 +182,7 @@
       });
     });
     return parsed;`);
-  js=js.replace('    instance.maxAlternatives = 1;',`    instance.maxAlternatives = 5;
+  patch('spraakalternatieven','    instance.maxAlternatives = 1;',`    instance.maxAlternatives = 5;
     try {
       const Phrase = window.SpeechRecognitionPhrase;
       if (Phrase && 'phrases' in instance) {
@@ -96,7 +191,7 @@
         catch { phraseObjects.forEach(phrase => instance.phrases.push(phrase)); }
       }
     } catch (error) { console.info('Contextuele spraakbias niet beschikbaar.', error); }`);
-  js=js.replace(`        const text = event.results[i][0].transcript.trim();
+  patch('spraakranking',`        const text = event.results[i][0].transcript.trim();
         if (event.results[i].isFinal) handleFinalVoiceTranscript(text);
         else interimText += \`${'${text}'} \`;`,`        const alternatives = Array.from(event.results[i]);
         const ranked = alternatives.map(alternative => {
@@ -108,6 +203,64 @@
         const text = (ranked[0]?.text || alternatives[0]?.transcript || '').trim();
         if (event.results[i].isFinal) handleFinalVoiceTranscript(text);
         else interimText += \`${'${text}'} \`;`);
+
+  patch('server-timeout',"    const response = await fetch(`${url}${path}`, {...options, headers});",`    const {timeoutMs = 12000, ...fetchOptions} = options;
+    const controller = fetchOptions.signal ? null : new AbortController();
+    const timeout = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
+    let response;
+    try {
+      response = await fetch(url + path, {...fetchOptions, headers, cache:'no-store', signal:fetchOptions.signal || controller.signal});
+    } catch (error) {
+      if (error?.name === 'AbortError') throw new Error('Server reageerde niet op tijd.');
+      throw error;
+    } finally {
+      if (timeout) clearTimeout(timeout);
+    }`);
+  patch('sync-backoff-start',`  async function syncNow({initial = false, silent = false} = {}) {
+    if (syncBusy || !getAiServerUrl() || !session || !navigator.onLine) return;`,`  async function syncNow({initial = false, silent = false, force = false} = {}) {
+    const syncGate = ensureSyncState();
+    if (syncBusy || !getAiServerUrl() || !session) return;
+    if (!force && !initial && Number(syncGate.nextRetryAt || 0) > Date.now()) return;`);
+  patch('sync-success-reset','        sync.lastSyncAt = Date.now();',`        sync.lastSyncAt = Date.now();
+        sync.failureCount = 0;
+        sync.nextRetryAt = 0;
+        sync.lastError = '';
+        sync.lastErrorAt = 0;`);
+  patch('sync-error-backoff',`    } catch (error) {
+      if (!silent) showToast(\`Synchronisatie uitgesteld: ${'${error.message}'}\`);
+      refreshServerButton('Server offline');
+    } finally {`,`    } catch (error) {
+      const sync = ensureSyncState();
+      sync.failureCount = Math.min(12, (Number(sync.failureCount) || 0) + 1);
+      const baseDelay = Math.min(30000, 1000 * (2 ** Math.min(5, sync.failureCount - 1)));
+      sync.nextRetryAt = Date.now() + baseDelay + Math.floor(Math.random() * 500);
+      sync.lastError = String(error?.message || error || 'Onbekende verbindingsfout');
+      sync.lastErrorAt = Date.now();
+      storageSet('local', STORAGE_KEY, JSON.stringify(state));
+      window.__kassaDurableStore?.persist(STORAGE_KEY,state).catch(()=>{});
+      if (!silent) showToast(\`Synchronisatie uitgesteld: ${'${sync.lastError}'}\`);
+      refreshServerButton('Server offline');
+    } finally {`);
+  patch('sync-planning',`    clearTimeout(syncTimer);
+    syncTimer = setTimeout(() => syncNow({silent:true}), 350);`,`    clearTimeout(syncTimer);
+    const retryAt = Number(ensureSyncState().nextRetryAt || 0);
+    const wait = Math.max(350, retryAt - Date.now());
+    syncTimer = setTimeout(() => syncNow({silent:true}), Math.min(wait, 30000));`);
+  patch('duurzame-state-save',`    storageSet('local', STORAGE_KEY, JSON.stringify(state));
+    lastSavedOrders = clone(state.orders || {});
+    scheduleServerSync();`,`    storageSet('local', STORAGE_KEY, JSON.stringify(state));
+    window.__kassaDurableStore?.persist(STORAGE_KEY,state).catch(()=>{});
+    lastSavedOrders = clone(state.orders || {});
+    scheduleServerSync();`);
+  patch('verbindings-events',`    window.addEventListener('online', () => syncNow({initial:true, silent:true}));
+    window.addEventListener('offline', () => refreshServerButton('Server offline'));`,`    window.addEventListener('online', () => syncNow({initial:true, silent:true, force:true}));
+    window.addEventListener('offline', () => refreshServerButton('Server offline'));
+    window.addEventListener('focus', () => syncNow({initial:true, silent:true, force:true}));
+    window.addEventListener('pageshow', () => syncNow({initial:true, silent:true, force:true}));
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') syncNow({initial:true, silent:true, force:true});
+    });`);
+  patch('sync-interval',"    setInterval(() => syncNow({initial:true, silent:true}), 4000);","    setInterval(() => syncNow({initial:true, silent:true}), 5000);");
 
   const runtimeApiExport=`
   window.__kassaVoiceApi = {
@@ -143,25 +296,43 @@
     getStaff: () => typeof STAFF !== 'undefined' ? STAFF : [],
     getTable: id => typeof tableDef === 'function' ? tableDef(id) : null,
     getOrder: id => typeof orderFor === 'function' ? orderFor(id) : null,
+    getStorageKey: () => typeof STORAGE_KEY !== 'undefined' ? STORAGE_KEY : 'registratiekassa-zoo-v1',
+    getDeviceId: () => typeof deviceId !== 'undefined' ? deviceId : '',
+    getServerUrl: () => typeof getAiServerUrl === 'function' ? getAiServerUrl() : '',
+    getSyncState: () => typeof ensureSyncState === 'function' ? ensureSyncState() : (typeof state !== 'undefined' ? state?._sync : null),
+    addProduct: (productId,qty=1,source='bediening') => { if (typeof addProduct === 'function') return addProduct(productId,qty,source); },
+    changeQuantity: (productId,delta,source='bediening') => { if (typeof changeQuantity === 'function') return changeQuantity(productId,delta,source); },
+    removeProduct: productId => { if (typeof removeProduct === 'function') return removeProduct(productId); },
+    syncNow: options => typeof syncNow === 'function' ? syncNow(options||{}) : Promise.resolve(),
     save: () => { if (typeof saveState === 'function') saveState(); },
     render: () => { if (typeof renderAll === 'function') renderAll(); },
-    toast: message => { if (typeof showToast === 'function') showToast(message); }
+    toast: message => { if (typeof showToast === 'function') showToast(message); },
+    persistNow: () => window.__kassaDurableStore?.persist(typeof STORAGE_KEY !== 'undefined' ? STORAGE_KEY : 'registratiekassa-zoo-v1',typeof state !== 'undefined' ? state : null)
   };
 `;
-  js=js.replace(/(\n\s*)function configureRecognition\(\)/,(match,indent)=>`${runtimeApiExport}${indent}function configureRecognition()`);
+  const apiPatched=js.replace(/(\n\s*)function configureRecognition\(\)/,(match,indent)=>`${runtimeApiExport}${indent}function configureRecognition()`);
+  if(apiPatched===js) console.warn('Runtime-API kon niet vóór configureRecognition worden toegevoegd.');
+  else js=apiPatched;
 
-  const [appleCss,voiceController,bossAuditCss,bossAudit]=await Promise.all([
+  const [appleCss,voiceController,bossAuditCss,bossAudit,orderHistoryAddon,interactionCss,orderControls,connectionManager]=await Promise.all([
     fetchText('apple-fixes.css'),
     fetchText('voice-controller.js'),
     fetchText('boss-audit.css'),
-    fetchText('boss-audit.js')
+    fetchText('boss-audit.js'),
+    fetchText('order-history-addon.js'),
+    fetchText('interaction-upgrades.css'),
+    fetchText('order-controls.js'),
+    fetchText('connection-manager.js')
   ]);
   const style=document.createElement('style');
-  style.textContent=css+'\n'+appleCss+'\n'+bossAuditCss;
+  style.textContent=css+'\n'+appleCss+'\n'+bossAuditCss+'\n'+interactionCss;
   document.head.appendChild(style);
   (0,eval)(js);
   (0,eval)(voiceController);
   (0,eval)(bossAudit);
+  (0,eval)(orderHistoryAddon);
+  (0,eval)(orderControls);
+  (0,eval)(connectionManager);
 })().catch(error=>{
   document.body.innerHTML=`<pre style="color:white;background:#07101b;padding:20px;white-space:pre-wrap">Registratiekassa kon niet starten:\n${error.stack||error}</pre>`;
 });
