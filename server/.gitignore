@@ -1,4 +1,9 @@
 .env
+.server-secret
 .server.pid
 server.log
+kassa_server.py
+registratiekassa.sqlite3*
+backups/
+__pycache__/
 .DS_Store
