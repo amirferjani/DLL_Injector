@@ -67,6 +67,26 @@
   js=js.replace('  function escapeRegExp(value)',helpers+'\n  function escapeRegExp(value)');
   js=js.replace('    let text = normalize(rawText);','    let text = normalizeVoiceText(rawText);');
   js=js.replace("    const text = normalize(rawText);\n    if (!/(verwijder|haal|wis|geen|weg)/.test(text)) return [];","    const text = normalizeVoiceText(rawText);\n    if (!/(verwijder|haal|wis|geen|weg)/.test(text)) return [];");
+  js=js.replace("    return [...quantities.entries()].map(([productId,qty]) => ({productId,qty}));",`    const parsed = [...quantities.entries()].map(([productId,qty]) => ({productId,qty}));
+    const parsedById = new Map(parsed.map(item => [item.productId,item]));
+    const amountPattern = '(?:een|één|twee|drie|vier|vijf|zes|zeven|acht|negen|tien|\\d+)';
+    const comboRules = [
+      {spirit:'p208',mixer:'p44',pattern:new RegExp('\\b('+amountPattern+')\\s+(?:witte\\s+(?:rum|bacardi)|bacardi\\s+wit)\\s+(?:cola|coca\\s+cola)\\b')},
+      {spirit:'p212',mixer:'p44',pattern:new RegExp('\\b('+amountPattern+')\\s+(?:bruine\\s+(?:rum|bacardi)|bacardi\\s+bruin)\\s+(?:cola|coca\\s+cola)\\b')},
+      {spirit:'p229',mixer:'p44',pattern:new RegExp('\\b('+amountPattern+')\\s+(?:vodka|wodka|eristoff?)\\s+(?:cola|coca\\s+cola)\\b')},
+      {spirit:'p157',mixer:'p44',pattern:new RegExp('\\b('+amountPattern+')\\s+(?:whisky|whiskey|jack\\s+daniels?)\\s+(?:cola|coca\\s+cola)\\b')},
+      {spirit:'p197',mixer:'p55',pattern:new RegExp('\\b('+amountPattern+')\\s+(?:gin|bombay(?:\\s+sapphire)?)\\s+tonic\\b')}
+    ];
+    comboRules.forEach(rule => {
+      const match = text.match(rule.pattern);
+      if (!match) return;
+      const qty = /^\\d+$/.test(match[1]) ? Number(match[1]) : (numberWords[match[1]] || 1);
+      [rule.spirit,rule.mixer].forEach(productId => {
+        const existing = parsedById.get(productId);
+        if (existing) existing.qty = qty;
+      });
+    });
+    return parsed;`);
   js=js.replace('    instance.maxAlternatives = 1;',`    instance.maxAlternatives = 3;
     try {
       const Phrase = window.SpeechRecognitionPhrase;
