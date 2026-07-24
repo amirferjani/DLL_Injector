@@ -27,14 +27,14 @@ else
   exit 1
 fi
 
-# Bouw de servercode uit de compacte GitHub-delen. Zo zijn geen npm- of
-# externe Python-pakketten nodig.
+# Bouw de servercode uit drie compacte delen. Er zijn geen npm- of externe
+# Python-pakketten nodig.
 "$PY" - <<'PY'
 from pathlib import Path
 import base64, gzip
-parts = sorted(Path('.').glob('backend.*.b64'))
+parts = sorted(Path('.').glob('kassa-core.*.b64'))
 if not parts:
-    raise SystemExit('De backend-delen ontbreken. Download de volledige GitHub-ZIP opnieuw.')
+    raise SystemExit('De serverdelen ontbreken. Download de volledige GitHub-ZIP opnieuw.')
 encoded = ''.join(path.read_text('utf-8').strip() for path in parts)
 Path('kassa_server.py').write_bytes(gzip.decompress(base64.b64decode(encoded)))
 PY
@@ -101,7 +101,7 @@ if [[ -n "$DNS_NAME" ]]; then
   echo "De server is alleen bereikbaar voor toegelaten apparaten in je Tailscale-netwerk."
   open "$APP_URL"
 else
-  echo "Open de HTTPS-URL uit Tailscale Serve en vul die in via de knop AI-server."
+  echo "Open de HTTPS-URL uit Tailscale Serve en vul die in via de knop Server instellen."
 fi
 
 echo
