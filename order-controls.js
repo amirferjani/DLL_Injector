@@ -11,17 +11,6 @@
   let pendingTap=null;
   let syntheticHistoryClick=false;
 
-  const selectedContext=productId=>{
-    const tableId=String(api.getSelectedTableId?.()||'');
-    const order=api.getState?.()?.orders?.[tableId];
-    if(!tableId||!order) return null;
-    return {
-      tableId,
-      orderId:String(order.id||order.orderId||`table:${tableId}`),
-      productId:String(productId)
-    };
-  };
-
   const productIdFor=row=>String(
     row?.dataset?.ticketRow||
     row?.querySelector?.('[data-quantity]')?.dataset?.quantity||
@@ -69,8 +58,7 @@
   }
 
   function handleLineContentClick(event){
-    if(syntheticHistoryClick) return;
-    if(event.defaultPrevented) return;
+    if(syntheticHistoryClick||event.defaultPrevented) return;
     if(event.target.closest('button,input,select,a,[data-no-double-add]')) return;
     const row=event.target.closest('#ticketList [data-ticket-row]');
     if(!row) return;
@@ -106,13 +94,15 @@
       const content=[...row.children].find(child=>child.tagName==='DIV'&&!child.classList.contains('ticket-actions')&&!child.classList.contains('rk-line-actions'))||row.querySelector('strong')?.parentElement;
       if(content){
         content.dataset.quickAdd='1';
-        content.title=boss
+        const title=boss
           ? 'Tik één keer voor geschiedenis; tik twee keer snel om één toe te voegen.'
           : 'Tik twee keer snel om één toe te voegen.';
-        content.setAttribute('aria-label',`${content.textContent?.trim()||'Product'}. ${content.title}`);
+        if(content.title!==title) content.title=title;
+        const label=`${content.textContent?.trim()||'Product'}. ${title}`;
+        if(content.getAttribute('aria-label')!==label) content.setAttribute('aria-label',label);
       }
 
-      let actions=row.querySelector('.rk-line-actions');
+      let actions=row.querySelector(':scope > .rk-line-actions');
       if(!actions){
         actions=document.createElement('div');
         actions.className='rk-line-actions';
@@ -139,9 +129,9 @@
 
       const remove=row.querySelector('[data-remove]');
       if(remove&&remove.parentElement!==actions) actions.appendChild(remove);
-      const history=row.querySelector('.item-history-button');
-      if(history&&history.nextSibling!==actions) row.insertBefore(history,actions);
-      row.appendChild(actions);
+      const history=row.querySelector(':scope > .item-history-button');
+      if(history&&history.nextElementSibling!==actions) row.insertBefore(history,actions);
+      if(actions.parentElement!==row||actions!==row.lastElementChild) row.appendChild(actions);
     });
   }
 
