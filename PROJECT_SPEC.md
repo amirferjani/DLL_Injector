@@ -19,7 +19,7 @@ Deze checklist bewaart de opdrachten uit de volledige chat. Flowchart wordt niet
 - Per productlijn naar links swipen voor Verplaats of Verwijder.
 - Waarschuwing bij gelijktijdige bewerking door meerdere personen/apparaten.
 - Baas-only auditlogboek met wie, wanneer en vanaf welk apparaat iets toevoegde of wijzigde.
-- Offline-first met IndexedDB; bij herstel van verbinding alleen nog onbevestigde bewerkingen synchroniseren.
+- Offline-first; bij herstel van verbinding alleen nog onbevestigde bewerkingen synchroniseren.
 - Centrale server met SQLite in WAL-modus, append-only operation log, unieke operation-ID’s, ondertekende sessietokens, login-rate-limiting, security headers, apparaatregistratie en back-ups.
 - Veilige Tailscale-link met naam Registratiekassa; gsm/iPad moeten de webapp op het beginscherm kunnen plaatsen.
 - Live spraak: herkende producten tijdens het spreken tonen, elk met een kruisje; correcties zoals “nee, ik bedoel…” en verwijderen moeten werken.
@@ -54,30 +54,31 @@ De eerdere onbewezen claim dat Flowchart `gpt-5.2` gebruikte, is ingetrokken.
 - Lokale parser voor aantallen, correcties en verwijderen.
 - De geverifieerde lokale Flowchart-methode wordt vóór elke externe AI-aanroep uitgevoerd.
 - Optionele veilige OpenAI-terugval wanneer de lokale parser niets betrouwbaar herkent.
-- Node.js-backend voor de OpenAI Responses API; product-ID’s en aantallen worden server-side gevalideerd.
+- Python-server zonder externe pakketten, met SQLite/WAL, unieke operation-ID’s, apparaatregistratie, ondertekende Team-/Baas-sessies, rate limiting, beveiligingsheaders, audit, betalingen en back-ups.
+- Synchronisatie van tafels en rekeningen tussen apparaten met lokale wachtrij en periodieke pull/push.
+- Optimistische revisies per tafel; een verouderde wijziging wordt als conflict geweigerd in plaats van stil te overschrijven.
+- Zichtbare server-/conflictstatus in de webapp.
 - Uitvoerbare `START.command` en `STOP.command` voor macOS en Tailscale Serve.
 - Oude DLL Injector bewaard op branch `backup/dll-injector-original-2026-07-24`.
 
-## Gebouwd maar nog niet op Amirs Mac geactiveerd
+## Gebouwd en getest, maar nog niet op Amirs Mac geactiveerd
 
-Deze onderdelen zijn alleen nodig voor de optionele extra AI, niet voor de gewone Flowchart-spraakwerking:
-
-- De lokale uitbreidingsserver starten via `server/START.command`.
-- Eén keer een OpenAI API-sleutel invoeren.
-- Tailscale HTTPS/Serve zo nodig één keer toestaan.
-- De gegenereerde Tailscale-serverlink op gsm en iPad laten opslaan.
+- `server/START.command` bouwt de Python-server uit drie gecontroleerde delen en start SQLite.
+- Tailscale Serve publiceert de lokale server privé via HTTPS binnen het tailnet.
+- De app ontvangt de Tailscale-link via de URL en maakt daarna Team- of Baas-sessies aan.
+- Een test met twee gesimuleerde apparaten is geslaagd: toestel A stuurde een tafelwijziging, toestel B ontving ze, en een opzettelijk verouderde wijziging werd als conflict geweigerd.
+- De database, geheime sessiesleutel en back-ups worden alleen lokaal op de Mac aangemaakt.
+- Extra OpenAI-herkenning is optioneel; de normale Flowchart-spraak werkt zonder API-sleutel.
 
 ## Nog niet volledig uitgevoerd
 
 - Publieke GitHub Pages-link: repository staat nog privé en Pages is niet als publicatiesource bevestigd.
-- Volledige kaart van ongeveer 260 producten en baas-interface voor kaart-/prijsbeheer verder controleren tegen de oorspronkelijke kaart.
-- Multi-user conflictwaarschuwingen.
-- Uitgebreid baasdashboard, centraal append-only auditlogboek, shifts, rapporten, dagafsluiting en uitgebreide deelbetalingen.
-- IndexedDB-operatiewachtrij en echte realtime multi-device synchronisatie.
-- Centrale SQLite/WAL-database, append-only log, sessietokens, device registration en automatische back-ups.
-- Het lokale serverpakket werkelijk installeren en starten op Amirs Mac.
+- Het lokale serverpakket werkelijk downloaden en `server/START.command` uitvoeren op Amirs Mac.
+- Volledige kaart en baas-interface voor kaart-/prijsbeheer verder controleren tegen de oorspronkelijke kaart.
+- Uitgebreid baasdashboard, shifts, rapporten, dagafsluiting en alle gewenste deelbetalingsvarianten.
+- Een volledige IndexedDB-operatiewachtrij; de huidige wachtrij gebruikt nog de bestaande lokale opslaglaag.
 - Productievalidatie, Belgische fiscale/GKS-koppeling en betaalterminal.
 
 ## AI-status
 
-De standaard spraakfunctie volgt nu de geverifieerde Flowchart-logica: browsertranscriptie, live lokale kaartcontrole en verwijderbare voorlopige resultaten. Dit werkt zonder API-sleutel en zonder Tailscale-server. Alleen wanneer lokaal niets betrouwbaar wordt gevonden én een serverlink is ingesteld, mag de optionele OpenAI-terugval worden gebruikt. De API-sleutel blijft uitsluitend op de Mac.
+De standaard spraakfunctie volgt de geverifieerde Flowchart-logica: browsertranscriptie, live lokale kaartcontrole en verwijderbare voorlopige resultaten. Dit werkt zonder API-sleutel en zonder Tailscale-server. Alleen wanneer lokaal niets betrouwbaar wordt gevonden én een serverlink is ingesteld, mag de optionele OpenAI-terugval worden gebruikt. De API-sleutel blijft uitsluitend op de Mac.
