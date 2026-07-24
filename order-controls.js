@@ -41,6 +41,11 @@
   function replaySingleHistoryClick(content){
     const isBoss=api.getSession?.()?.role==='boss';
     if(!isBoss||!content?.isConnected) return;
+    const historyButton=content.closest('[data-ticket-row]')?.querySelector('.item-history-button');
+    if(historyButton){
+      historyButton.click();
+      return;
+    }
     syntheticHistoryClick=true;
     try{
       content.dispatchEvent(new MouseEvent('click',{bubbles:false,cancelable:true,view:window}));
