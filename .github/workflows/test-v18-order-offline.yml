@@ -53,3 +53,5 @@ jobs:
           git add analysis-test-results || true
           git commit -m "Record v18 real-browser test results" || exit 0
           git push origin HEAD:analysis/materialized-source-2026-07-25
+
+# Retry 2: wait for the cashier runtime before interacting with the boss PIN.
