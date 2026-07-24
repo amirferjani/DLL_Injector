@@ -29,14 +29,22 @@ if (( NODE_MAJOR < 20 )); then
 fi
 
 if [[ ! -f .env ]]; then
-  echo "Eerste configuratie van de veilige AI-server."
-  read -s "OPENAI_KEY?OpenAI API-sleutel (wordt lokaal in .env bewaard): "
-  echo
-  if [[ -z "$OPENAI_KEY" ]]; then
-    echo "Geen sleutel ingevoerd; de server kan dan alleen een healthcheck geven."
+  echo "Eerste configuratie van de optionele extra AI."
+  echo "De normale Flowchart-spraakwerking heeft geen API-sleutel of model nodig."
+  read "ENABLE_AI?Wil je de optionele extra AI instellen? [j/N]: "
+  ENABLE_AI="${ENABLE_AI:l}"
+  OPENAI_KEY=""
+  MODEL="disabled"
+  if [[ "$ENABLE_AI" == "j" || "$ENABLE_AI" == "ja" || "$ENABLE_AI" == "y" || "$ENABLE_AI" == "yes" ]]; then
+    read -s "OPENAI_KEY?OpenAI API-sleutel (wordt alleen lokaal in .env bewaard): "
+    echo
+    read "MODEL?Exact OpenAI-model dat je bewust wilt gebruiken: "
+    if [[ -z "$OPENAI_KEY" || -z "$MODEL" ]]; then
+      echo "Sleutel of model ontbreekt; extra AI wordt uitgeschakeld. Lokale spraak blijft werken."
+      OPENAI_KEY=""
+      MODEL="disabled"
+    fi
   fi
-  read "MODEL?OpenAI-model [gpt-5-mini]: "
-  MODEL="${MODEL:-gpt-5-mini}"
   cat > .env <<ENV
 OPENAI_API_KEY=$OPENAI_KEY
 OPENAI_MODEL=$MODEL
@@ -73,11 +81,11 @@ if [[ -n "$DNS_NAME" ]]; then
   ENCODED="$(SERVER_URL="$SERVER_URL" /usr/bin/python3 -c 'import os,urllib.parse; print(urllib.parse.quote(os.environ["SERVER_URL"], safe=""))')"
   APP_URL="https://amirferjani.github.io/DLL_Injector/?server=$ENCODED"
   echo
-  echo "AI-server: $SERVER_URL"
+  echo "Optionele uitbreidingsserver: $SERVER_URL"
   echo "Kassa: $APP_URL"
   open "$APP_URL"
 else
-  echo "Open de URL die hierboven bij Tailscale Serve staat en vul die in via de knop AI-server."
+  echo "Open de URL die hierboven bij Tailscale Serve staat en vul die in via de knop Extra AI."
 fi
 
 echo
