@@ -3,6 +3,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 PORT="${PORT:-8765}"
+TRANSCRIBE_PORT="${TRANSCRIBE_PORT:-8766}"
 TS=""
 PY=""
 
@@ -27,7 +28,7 @@ else
   exit 1
 fi
 
-# Bouw de servercode uit drie compacte delen. Er zijn geen npm- of externe
+# Bouw de centrale servercode uit compacte delen. Er zijn geen npm- of externe
 # Python-pakketten nodig.
 "$PY" - <<'PY'
 from pathlib import Path
@@ -38,34 +39,37 @@ if not parts:
 encoded = ''.join(path.read_text('utf-8').strip() for path in parts)
 Path('kassa_server.py').write_bytes(gzip.decompress(base64.b64decode(encoded)))
 PY
-chmod 700 kassa_server.py
+chmod 700 kassa_server.py dutch_transcriber.py
 
 if [[ ! -f .env ]]; then
   echo "Eerste configuratie van Registratiekassa."
   read "PIN?Baas-PIN [0607]: "
   PIN="${PIN:-0607}"
-  read "ENABLE_AI?Optionele extra AI instellen? De gewone live spraak werkt zonder. [j/N]: "
-  ENABLE_AI="${ENABLE_AI:l}"
+  echo
+  echo "Voor betrouwbare Nederlandse spraak kan de Mac-server GPT-4o Transcribe gebruiken."
+  echo "De API-sleutel blijft alleen in deze map en komt nooit in GitHub of de browser."
+  read "ENABLE_TRANSCRIBE?Nauwkeurige Nederlandse transcriptie instellen? [j/N]: "
+  ENABLE_TRANSCRIBE="${ENABLE_TRANSCRIBE:l}"
   OPENAI_KEY=""
-  MODEL="disabled"
-  if [[ "$ENABLE_AI" == "j" || "$ENABLE_AI" == "ja" || "$ENABLE_AI" == "y" || "$ENABLE_AI" == "yes" ]]; then
+  if [[ "$ENABLE_TRANSCRIBE" == "j" || "$ENABLE_TRANSCRIBE" == "ja" || "$ENABLE_TRANSCRIBE" == "y" || "$ENABLE_TRANSCRIBE" == "yes" ]]; then
     read -s "OPENAI_KEY?OpenAI API-sleutel (alleen lokaal bewaard): "
     echo
-    read "MODEL?Exact OpenAI-model dat je bewust wilt gebruiken: "
-    if [[ -z "$OPENAI_KEY" || -z "$MODEL" ]]; then
-      echo "Sleutel of model ontbreekt; extra AI wordt uitgeschakeld."
-      OPENAI_KEY=""
-      MODEL="disabled"
-    fi
   fi
   cat > .env <<ENV
 BOSS_PIN=$PIN
 OPENAI_API_KEY=$OPENAI_KEY
-OPENAI_MODEL=$MODEL
+OPENAI_MODEL=disabled
+OPENAI_TRANSCRIBE_MODEL=gpt-4o-transcribe
+OPENAI_TRANSCRIBE_LANGUAGE=nl
 PORT=$PORT
+TRANSCRIBE_PORT=$TRANSCRIBE_PORT
 ALLOWED_ORIGINS=https://amirferjani.github.io,http://127.0.0.1:$PORT,http://localhost:$PORT
 ENV
   chmod 600 .env
+else
+  grep -q '^OPENAI_TRANSCRIBE_MODEL=' .env || echo 'OPENAI_TRANSCRIBE_MODEL=gpt-4o-transcribe' >> .env
+  grep -q '^OPENAI_TRANSCRIBE_LANGUAGE=' .env || echo 'OPENAI_TRANSCRIBE_LANGUAGE=nl' >> .env
+  grep -q '^TRANSCRIBE_PORT=' .env || echo "TRANSCRIBE_PORT=$TRANSCRIBE_PORT" >> .env
 fi
 
 if [[ -f .server.pid ]] && kill -0 "$(cat .server.pid)" 2>/dev/null; then
@@ -76,15 +80,31 @@ else
   sleep 1
 fi
 
+if [[ -f .transcriber.pid ]] && kill -0 "$(cat .transcriber.pid)" 2>/dev/null; then
+  echo "De Nederlandse transcriptieserver draait al met PID $(cat .transcriber.pid)."
+else
+  nohup "$PY" dutch_transcriber.py >> transcriber.log 2>&1 &
+  echo $! > .transcriber.pid
+  sleep 1
+fi
+
 if ! curl -fsS "http://127.0.0.1:$PORT/health" >/dev/null; then
-  echo "De server startte niet correct. Bekijk server.log."
+  echo "De centrale server startte niet correct. Bekijk server.log."
   tail -60 server.log || true
+  read "?Druk Enter om te sluiten."
+  exit 1
+fi
+
+if ! curl -fsS "http://127.0.0.1:$TRANSCRIBE_PORT/health" >/dev/null; then
+  echo "De Nederlandse transcriptieserver startte niet correct. Bekijk transcriber.log."
+  tail -60 transcriber.log || true
   read "?Druk Enter om te sluiten."
   exit 1
 fi
 
 echo "Tailscale Serve wordt privé binnen je tailnet via HTTPS ingesteld…"
 "$TS" serve --bg --https=443 "127.0.0.1:$PORT"
+"$TS" serve --bg --https=8443 "127.0.0.1:$TRANSCRIBE_PORT"
 
 echo
 "$TS" serve status || true
@@ -96,13 +116,14 @@ if [[ -n "$DNS_NAME" ]]; then
   APP_URL="https://amirferjani.github.io/DLL_Injector/?server=$ENCODED"
   echo
   echo "Registratiekassa-server: $SERVER_URL"
+  echo "Nederlandse transcriptie: https://$DNS_NAME:8443"
   echo "Kassa: $APP_URL"
   echo "Database: $(pwd)/registratiekassa.sqlite3"
-  echo "De server is alleen bereikbaar voor toegelaten apparaten in je Tailscale-netwerk."
+  echo "De servers zijn alleen bereikbaar voor toegelaten apparaten in je Tailscale-netwerk."
   open "$APP_URL"
 else
   echo "Open de HTTPS-URL uit Tailscale Serve en vul die in via de knop Server instellen."
 fi
 
 echo
-read "?Alles draait. Druk Enter om dit venster te sluiten; de server blijft actief."
+read "?Alles draait. Druk Enter om dit venster te sluiten; de servers blijven actief."
