@@ -34,6 +34,7 @@ try {
 
   const revisions = new Map();
   let cursor = 0;
+  let serverAvailable = true;
   await context.route(`${fakeServer}/**`, async route => {
     const request = route.request();
     const url = new URL(request.url());
@@ -47,6 +48,10 @@ try {
     };
     if (request.method() === 'OPTIONS') {
       await route.fulfill({ status: 204, headers, body: '' });
+      return;
+    }
+    if (!serverAvailable) {
+      await route.abort('internetdisconnected');
       return;
     }
     if (url.pathname === '/health') {
@@ -151,10 +156,11 @@ try {
   await page.waitForFunction(() => navigator.serviceWorker?.controller, null, { timeout: 15000 });
   check('PWA-serviceworker bestuurt de pagina', true);
 
+  serverAvailable = false;
   await context.setOffline(true);
   await page.waitForTimeout(300);
   await product.click();
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(700);
   check('Bediening blijft offline lokaal werken', (await page.locator('#ticketList .qty-button').first().textContent())?.trim() === '2×');
 
   const queuedOffline = await page.evaluate(() => window.__kassaAppApi.getSyncState().queue.length);
@@ -177,6 +183,7 @@ try {
   await page.locator('#ticketList .qty-button').first().waitFor();
   check('IndexedDB-veiligheidskopie herstelt bestelling bij offline reload', (await page.locator('#ticketList .qty-button').first().textContent())?.trim() === '2×');
 
+  serverAvailable = true;
   await context.setOffline(false);
   await page.waitForFunction(() => (window.__kassaAppApi.getSyncState().queue || []).length === 0, null, { timeout: 25000 });
   await page.waitForFunction(() => document.querySelector('#serverButton')?.dataset.connectionState === 'online', null, { timeout: 15000 });
