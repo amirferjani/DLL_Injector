@@ -1,0 +1,109 @@
+{
+  "startedAt": "2026-07-24T22:52:09.778Z",
+  "passed": true,
+  "checks": [
+    {
+      "name": "Baaslogin werkt",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Testserver wordt als online weergegeven",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Product kan normaal toegevoegd worden",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Eén tik opent als Baas nog steeds productgeschiedenis",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Eén tik verhoogt het aantal niet",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Dubbele tik verhoogt exact met één",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Dubbele tik opent geen geschiedenis",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Minteken staat naast het kruis",
+      "ok": true,
+      "details": "[\"−\",\"×\"]"
+    },
+    {
+      "name": "Minteken vermindert exact één",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Plus en min blijven in het append-only auditlog zichtbaar",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "PWA-serviceworker bestuurt de pagina",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Bediening blijft offline lokaal werken",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Offline wijziging blijft in lokale synchronisatiewachtrij",
+      "ok": true,
+      "details": "queue=1"
+    },
+    {
+      "name": "Verbindingsfout krijgt backoff en blijft bewaard",
+      "ok": true,
+      "details": "{\"lastError\":\"Failed to fetch\",\"nextRetryAt\":1784933535272,\"failureCount\":2}"
+    },
+    {
+      "name": "IndexedDB-veiligheidskopie herstelt bestelling bij offline reload",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Wachtrij wordt na verbindingsherstel bevestigd en geleegd",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Fake SQLite/Tailscale-server ontving mutaties",
+      "ok": true,
+      "details": "{\"syncCalls\":5,\"acceptedMutations\":3,\"acceptedAudits\":4,\"acceptedPayments\":0}"
+    },
+    {
+      "name": "Geen onverwachte JavaScript-paginafouten",
+      "ok": true,
+      "details": ""
+    }
+  ],
+  "browserErrors": [],
+  "expectedNetworkErrors": [
+    "Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "Failed to load resource: net::ERR_INTERNET_DISCONNECTED"
+  ],
+  "fakeServer": {
+    "syncCalls": 5,
+    "acceptedMutations": 3,
+    "acceptedAudits": 4,
+    "acceptedPayments": 0
+  },
+  "finishedAt": "2026-07-24T22:52:14.960Z"
+}

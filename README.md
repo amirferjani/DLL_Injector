@@ -1,47 +1,69 @@
 # Registratiekassa · Café De Zoo
 
-Webapp voor tafelbeheer, bestellingen, betalingen, baascontrole, live Nederlandstalige spraakinvoer en gedeelde kassadata via een lokale Mac/Tailscale-server.
+Webapp voor tafelbeheer, bestellingen, betalingen, baascontrole, live Nederlandstalige spraak en gedeelde kassadata via een lokale Mac/Tailscale-server.
 
 ## Openen
 
-De publieke app staat op:
+De gepubliceerde webapp staat op:
 
 `https://amirferjani.github.io/DLL_Injector/`
 
-Na een grote update of oude Safari/PWA-cache open je één keer:
+Na een grote update open je één keer `reset-kassa.html`. Die verwijdert alleen oude websitecaches; bestellingen en loggegevens worden niet bewust gewist.
 
-`https://amirferjani.github.io/DLL_Injector/reset-kassa.html`
+## Snelle bediening van een bestellingsregel
 
-## Werking
+- **Dubbele tik of dubbele klik op de producttekst:** verhoogt het aantal exact met één.
+- **Minteken `−`:** vermindert het aantal exact met één.
+- **Kruis `×`:** verwijdert de volledige productregel.
+- **Tik op het aantal:** opent de bestaande dialoog om een exact aantal in te vullen.
+- **Als Baas één keer op de producttekst tikken:** opent nog steeds de productgeschiedenis. De app wacht heel kort om een enkele tik van een dubbele tik te onderscheiden.
 
-- Kies bij het starten wie werkt, of open de Baasomgeving met PIN `0607`.
-- Wissel bovenaan tussen **Beide**, **Plattegrond** en **Bestellen**.
-- Op desktop kan de scheiding tussen tafelplan en bestelmenu versleept worden.
-- Op telefoon staan de delen onder elkaar en springt de app na tafelkeuze naar de bestelling.
-- Spraak gebruikt Nederlandse browsertranscriptie plus lokale controle tegen de productkaart.
-- Voorlopig herkende producten verschijnen live met een kruisje om ze weg te laten.
-- Bestellingen blijven lokaal/offline bruikbaar.
-- Met `server/START.command` worden tafels en rekeningen via SQLite/WAL en Tailscale tussen Mac, gsm en iPad gesynchroniseerd.
-- Gelijktijdige verouderde wijzigingen worden als conflict gemeld in plaats van stil te worden overschreven.
+Alle plus- en minhandelingen blijven zichtbaar in het append-only auditlog.
 
-## Baascentrum en geschiedenis
+## Offline en verbinding
 
-Als Baas verschijnt bovenaan **Baascentrum**. Daar staan:
+De bediening blokkeert niet wanneer wifi, internet, Tailscale of de Mac-server tijdelijk wegvalt.
 
-- activiteit en verwijderde regels;
-- filters op datum, medewerker, tafel, actie, apparaat en zoektekst;
-- groepering en aantallen per rekening;
-- CSV-export;
-- rekeninghistorie, shifts, dagafsluiting en basisrapporten.
+- Iedere wijziging wordt eerst lokaal toegepast.
+- De bestaande synchronisatiewachtrij blijft lokaal opgeslagen.
+- Een extra IndexedDB-kopie beschermt de actuele kassastand tegen een ontbrekende of beschadigde `localStorage`-waarde.
+- De serverknop toont **verbonden**, **synchroniseren**, **offline** of **conflict**.
+- Serveraanvragen hebben een time-out en retries gebruiken exponentiële backoff met jitter.
+- Bij netwerkherstel, terugkeer naar de app, focus of `pageshow` wordt onmiddellijk opnieuw gesynchroniseerd.
+- De serviceworker bewaart ook de nieuwe bedienings- en verbindingsbestanden voor offline gebruik.
 
-Als Baas kan je bovendien rechtstreeks op de producttekst of **Geschiedenis** bij een bestellijn drukken. Dan zie je wie het product wanneer toevoegde, bestelde, verplaatste of verwijderde. Het lokale log is append-only. Voor één centraal overzicht over alle toestellen moet de Mac/Tailscale-server draaien.
+De centrale server gebruikt SQLite in WAL-modus, unieke operatie-ID’s, tabelrevisies en conflictdetectie. Een lokale wijziging wordt pas uit de wachtrij verwijderd nadat de server ze heeft bevestigd.
 
-Het gecontroleerde herstelregister staat in `FEATURE_AUDIT.md`.
+## Baasomgeving
+
+Na aanmelden via **Baasomgeving openen** en PIN `0607`:
+
+- druk op een productregel voor de volledige tijdlijn;
+- bekijk per rekening wie hoeveel toevoegde, verwijderde of bestelde;
+- gebruik filters op datum, medewerker, tafel, actie en apparaat;
+- bekijk verwijderde regels, rekeningen, shifts, dagafsluiting en rapporten;
+- exporteer een gefilterd logboek als CSV.
 
 ## Server starten
 
-Download de repository als ZIP, open de map `server` en dubbelklik op `START.command`. Het script gebruikt Python 3 en Tailscale; externe Python- of Node-pakketten zijn niet nodig. De optionele nauwkeurige Nederlandse transcriptie gebruikt een API-sleutel die uitsluitend lokaal op de Mac wordt bewaard.
+Download de repository als ZIP, open de map `server` en dubbelklik op `START.command`. De centrale server draait lokaal op de Mac en wordt privé via Tailscale Serve bereikbaar. Gebruik geen Tailscale Funnel voor deze kassa.
+
+## Testbewijs v18
+
+De mobiele E2E-test controleert onder meer:
+
+- enkele tik versus dubbele tik;
+- `−` naast `×`;
+- auditregistratie van plus en min;
+- lokale bediening tijdens een echte gesimuleerde serverstoring;
+- blijvende synchronisatiewachtrij;
+- backoff na een verbindingsfout;
+- herstel uit IndexedDB na een offline reload;
+- bevestiging en leegmaken van de wachtrij na verbindingsherstel;
+- geen onverwachte JavaScript-fouten.
+
+Zie `docs/TEST_RESULTS_V18.md` en `docs/OFFLINE_APP_PLAN.md`.
 
 ## Belangrijk
 
-Dit is een test- en bedieningsprototype, geen gecertificeerd Belgisch GKS/fiscaal kassasysteem. Voor productiegebruik zijn verdere controles, fiscale/GKS-integratie en operationele beveiligingsvalidatie nodig.
+Dit blijft een test- en bedieningsprototype, geen gecertificeerd Belgisch GKS/fiscaal kassasysteem. Voor productiegebruik zijn fiscale/GKS-integratie, betaalterminalkoppeling, langdurige multi-iPad-tests, beveiligingsvalidatie en operationele procedures nodig.

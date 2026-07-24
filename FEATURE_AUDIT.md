@@ -1,65 +1,91 @@
 # Registratiekassa — feature-audit en herstelregister
 
-Datum audit: 24 juli 2026
+Laatste audit: 25 juli 2026
 
-Dit document bestaat omdat functies nooit meer stilzwijgend mogen verdwijnen. Voor grote wijzigingen wordt eerst een back-upbranch gemaakt. De toestand vóór dit herstel staat op:
+Dit document bestaat omdat kassafuncties nooit stilzwijgend mogen verdwijnen. Voor iedere grotere wijziging wordt eerst een back-upbranch gemaakt en daarna een echte browsertest uitgevoerd.
 
-`backup/pre-full-feature-audit-2026-07-24`
+## Back-upbranches
+
+- `backup/dll-injector-original-2026-07-24`
+- `backup/pre-full-feature-audit-2026-07-24`
+- `backup/pre-order-controls-offline-2026-07-25`
 
 ## Behouden en aanwezig
 
 - Teamlogin en Baaslogin met PIN.
-- 33 tafels, terras T1–T8 en de drie tafelstatussen.
+- 33 tafels, terras T1–T8 en de tafelstatussen vrij, open en rekening gevraagd.
 - Beide / Plattegrond / Bestellen en versleepbare desktopverdeling.
-- Mobiele en Apple/PWA-weergave.
+- Mobiele, iPad- en Apple/PWA-weergave met safe-area-correcties.
 - Kaart met 260 producten, categorieën, zoeken, favorieten en recente producten.
 - Toevoegen, aantallen wijzigen, verwijderen, bestellen en betalen.
 - Rekening gevraagd.
 - Volledige rekening verplaatsen of samenvoegen.
 - Eén of meerdere productlijnen selecteren, verplaatsen of verwijderen.
 - Swipe-acties op productlijnen.
-- Kaart- en prijsbeheer voor de baas.
+- Kaart- en prijsbeheer voor de Baas.
+- Directe product- en rekeninghistoriek.
+- Uitgebreid Baascentrum met filters, verwijderde regels, rekeningen, shifts, dagafsluiting, rapporten en CSV-export.
 - Lokale offline opslag en PWA-installatie.
-- Gedeelde Tailscale/SQLite-server, conflictdetectie en back-ups wanneer die op de Mac gestart is.
-- Nederlandse spraak, kaartaliassen en optionele nauwkeurige Nederlandse servertranscriptie.
+- Gedeelde Tailscale/SQLite-server, unieke operatie-ID’s, conflictdetectie en back-ups wanneer die op de Mac gestart is.
+- Nederlandse spraak, kaartaliassen, huismerken, mixdranken en optionele nauwkeurige Nederlandse servertranscriptie.
 
-## Functies die aantoonbaar waren teruggevallen of niet meer goed bereikbaar waren
+## V18 toegevoegd zonder bestaande bediening te verwijderen
 
-- Het auditlogboek was teruggebracht tot één eenvoudige lijst zonder de oude filters.
-- Er was geen directe geschiedenis meer door op een productregel in de bestelling te drukken.
-- Toevoegingen en verwijderingen werden niet duidelijk per rekening en per medewerker opgeteld.
-- Verwijderde regels waren niet gemakkelijk apart terug te vinden nadat ze uit de rekening verdwenen.
-- De Baasomgeving bevatte geen geïntegreerde rekeninghistorie, shiftweergave, dagafsluiting en rapportoverzicht.
-- Een lokaal log en een centraal log waren in de interface onvoldoende van elkaar te onderscheiden.
+- Dubbele tik of dubbele klik op de producttekst verhoogt exact één.
+- Een enkele tik blijft voor de Baas de productgeschiedenis openen.
+- Een zichtbaar minteken staat rechtstreeks naast het kruis.
+- Het minteken vermindert exact één.
+- Het kruis blijft de volledige productregel verwijderen.
+- De bestaande aantalknop en aantaldialoog blijven behouden.
+- De plus- en minhandelingen blijven zichtbaar in het append-only auditlog.
+- De serverknop toont lokaal, verbonden, synchroniseren, offline of conflict.
+- Serveraanvragen hebben een time-out.
+- Verbindingsfouten krijgen exponentiële backoff met jitter.
+- Onmiddellijke retry bij netwerkherstel, focus, `pageshow` en terugkeer uit de achtergrond.
+- De kassastand krijgt een aanvullende IndexedDB-veiligheidskopie.
+- De synchronisatiewachtrij blijft ook bij een serverstoring lokaal bewaard.
+- De serviceworker cachet alle nieuwe v18-bestanden.
 
-## In deze herstelronde teruggebracht
+## Functies verwijderd in v18
 
-- Append-only lokaal auditlog dat verwijderingen niet weggooit.
-- Import van bestaande audit-/operationlog-arrays wanneer die al in de kassastatus aanwezig zijn.
-- Automatische registratie van:
-  - rekening geopend, gesloten, verwijderd of verplaatst;
-  - product toegevoegd, verwijderd, besteld of naar een andere tafel verplaatst;
-  - rekening gevraagd of geannuleerd;
-  - betalingen;
-  - kaartwijzigingen;
-  - shifts en dagafsluitingen.
-- Volledige filters op datum, medewerker, tafel, actie, apparaat en vrije zoektekst.
-- CSV-export van het gefilterde logboek.
-- Aparte weergave voor verwijderde producten en rekeningen.
-- Groepering per rekening met aantallen toegevoegd/verwijderd en omzet.
-- Directe productgeschiedenis: als Baas op de producttekst of de geschiedenisknop van een bestellijn drukken.
-- Detailtijdlijn per product of per rekening met medewerker, tijdstip, apparaat en bron.
-- Baascentrum met rekeninghistorie, shifts, dagafsluiting en basisrapporten.
+**Geen.**
 
-## Nog gedeeltelijk of afhankelijk van de Mac-server
+De nieuwe code wordt aanvullend geladen bovenop de bestaande kassakern. De gecomprimeerde productkaart, tafelplan, betaalfuncties, verplaatsfuncties, spraak, Baascentrum en serverkern zijn niet vervangen.
 
-- Een volledig centraal log over alle toestellen is alleen betrouwbaar wanneer de Tailscale/SQLite-server op de Mac draait en alle toestellen daarmee verbonden zijn.
-- Gebeurtenissen van vóór deze herstelupdate kunnen alleen worden geïmporteerd wanneer ze nog in een bestaand lokaal of centraal log aanwezig zijn. Bestaande open regels zonder oud log krijgen een duidelijke beginsnapshot; ontbrekende historische handelingen worden niet verzonnen.
-- Uitgebreide deelbetalingen, terugbetalingen en fiscale/GKS-koppeling vereisen nog afzonderlijke productievalidatie.
+## Gecontroleerde v18-werking
+
+Een echte mobiele Chromium/Playwright-test op de volledige webapp bevestigde:
+
+- Baaslogin en serververbinding;
+- normale producttoevoeging;
+- enkele tik opent geschiedenis en verhoogt niet;
+- dubbele tik verhoogt exact één en opent geen geschiedenis;
+- `−` staat naast `×`;
+- `−` vermindert exact één;
+- plus en min blijven in het auditlog;
+- PWA-serviceworker bestuurt de pagina;
+- bediening blijft werken terwijl de server hard onbereikbaar is;
+- de offline wijziging blijft in de wachtrij;
+- backoff wordt opgeslagen;
+- IndexedDB herstelt de rekening na een offline reload;
+- de wachtrij wordt na herstel door de testserver bevestigd en geleegd;
+- geen onverwachte JavaScript-paginafouten.
+
+Zie `docs/TEST_RESULTS_V18.md`.
+
+## Grenzen en nog te valideren
+
+- Volledig centraal auditoverzicht over alle toestellen vereist dat de Mac/Tailscale/SQLite-server draait en ieder toestel daarmee verbonden is.
+- De huidige clientwachtrij coalesceert wijzigingen per tafel als een veilige tafelsnapshot. Voor een latere native app is een fijnmazige append-only delta-operatiewachtrij aanbevolen.
+- iOS kan achtergrondwerk beperken; daarom synchroniseert de app onmiddellijk bij hervatten en openen.
+- Langdurige tests met meerdere echte iPads, stroomuitval, routerwissels en Tailscale-herauthenticatie blijven nodig.
+- Uitgebreide deelbetalingen, terugbetalingen, fiscale correcties, GKS en betaalterminal blijven productieonderwerpen.
 
 ## Wijzigingsregel vanaf nu
 
 1. Eerst een back-upbranch.
-2. Daarna een featurevergelijking tegen dit bestand.
-3. Geen bestaande bediening verwijderen zonder dat ze expliciet in dit register wordt vermeld.
-4. Nieuwe interfacecode wordt zo veel mogelijk aanvullend geladen, zodat de kassakern niet opnieuw volledig wordt vervangen.
+2. Vergelijk de wijziging met dit register en de projectspecificatie.
+3. Verwijder geen bestaande bediening zonder expliciete vermelding en toestemming.
+4. Test zowel de nieuwe functie als de oude functies die ermee overlappen.
+5. Publiceer pas na een geslaagde browsertest.
+6. Bewaar testbewijs en documenteer resterende beperkingen.
