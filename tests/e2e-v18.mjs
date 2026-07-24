@@ -102,7 +102,9 @@ try {
   });
 
   await page.goto(`${baseUrl}/?test=v18`, { waitUntil: 'domcontentloaded' });
+  await page.locator('.staff-card').first().waitFor({ timeout: 20000 });
   await page.locator('#bossLoginButton').click();
+  await page.locator('#bossPinWrap:not(.hidden)').waitFor();
   await page.locator('#bossPin').fill('0607');
   await page.locator('#bossPinSubmit').click();
   await page.locator('#app:not(.hidden)').waitFor({ timeout: 15000 });
