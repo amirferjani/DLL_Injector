@@ -1,5 +1,5 @@
 {
-  "startedAt": "2026-07-24T22:43:45.470Z",
+  "startedAt": "2026-07-24T22:46:03.811Z",
   "passed": false,
   "checks": [
     {
@@ -16,15 +16,60 @@
       "name": "Product kan normaal toegevoegd worden",
       "ok": true,
       "details": ""
+    },
+    {
+      "name": "Eén tik opent als Baas nog steeds productgeschiedenis",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Eén tik verhoogt het aantal niet",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Dubbele tik verhoogt exact met één",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Dubbele tik opent geen geschiedenis",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Minteken staat naast het kruis",
+      "ok": true,
+      "details": "[\"−\",\"×\"]"
+    },
+    {
+      "name": "Minteken vermindert exact één",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Plus en min blijven in het append-only auditlog zichtbaar",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "PWA-serviceworker bestuurt de pagina",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Bediening blijft offline lokaal werken",
+      "ok": true,
+      "details": ""
     }
   ],
   "browserErrors": [],
   "fakeServer": {
-    "syncCalls": 3,
-    "acceptedMutations": 1,
-    "acceptedAudits": 1,
+    "syncCalls": 6,
+    "acceptedMutations": 4,
+    "acceptedAudits": 4,
     "acceptedPayments": 0
   },
-  "finishedAt": "2026-07-24T22:43:46.711Z",
-  "failure": "Error: Eén tik opent als Baas nog steeds productgeschiedenis\n    at check (file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v18.mjs:18:21)\n    at file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v18.mjs:128:3\n    at runNextTicks (node:internal/process/task_queues:60:5)\n    at process.processImmediate (node:internal/timers:454:9)\n    at process.callbackTrampoline (node:internal/async_hooks:130:17)"
+  "finishedAt": "2026-07-24T22:46:07.164Z",
+  "failure": "Error: Offline wijziging blijft in lokale synchronisatiewachtrij: queue=0\n    at check (file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v18.mjs:18:21)\n    at file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v18.mjs:161:3"
 }
