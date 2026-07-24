@@ -1,4 +1,4 @@
-const CACHE='registratiekassa-zoo-v11';
+const CACHE='registratiekassa-zoo-v12';
 const APP_PARTS=Array.from({length:7},(_,index)=>`./assets/app.full.${String(index+1).padStart(2,'0')}.b64`);
 const FILES=['./','./index.html','./loader.js','./manifest.webmanifest','./icons/icon.svg','./assets/styles.css.gz.b64',...APP_PARTS];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting())));
