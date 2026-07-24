@@ -32,7 +32,7 @@
       p197:['gin','huisgin','huis gin','bombay gin','bombay safier','bombay saffier','bombay safire','bombay sapphire gin'],
       p208:['bacardi','witte bacardi','bacardi wit','witte rum','white rum','huisrum wit'],
       p212:['bruine bacardi','bacardi bruin','bruine rum','donkere rum','dark rum','huisrum bruin'],
-      p229:['vodka','wodka','eristof','eristoff','eristoff white','huisvodka','huis vodka']
+      p229:['vodka','wodka','eristof','eristoff','eristov','aristof','aristoff','er is tof','er is toff','er is top','er is stop','risto','ristoff','eristoff white','huisvodka','huis vodka']
     };
     const gaugin=byId.get('p203');
     if(gaugin) gaugin.aliases=(gaugin.aliases||[]).filter(alias=>!['gin tonic','gin en tonic'].includes(String(alias).toLowerCase()));
@@ -48,7 +48,7 @@
   const voicePhraseCorrections = [
     [/\\b(?:porno|porn)\\s+star\\s+martini\\b/g, 'pornstar martini'],
     [/\\b(?:voor een )?star\\s+martini\\b/g, 'pornstar martini'],
-    [/\\beristof\\b/g, 'eristoff'],
+    [/\\b(?:er\\s+is\\s+(?:tof|toff|top|stop)|aristof+|eristov|eristof+|ristof+)\\b/g, 'eristoff'],
     [/\\bbombay\\s+(?:safier|saffier|safire)\\b/g, 'bombay sapphire'],
     [/\\bjack\\s+daniel\\b/g, 'jack daniels'],
     [/\\bwodka\\b/g, 'vodka']
@@ -59,7 +59,7 @@
     return normalized;
   }
   function speechBiasPhrases() {
-    const house = ['witte rum','witte bacardi','bruine rum','bruine bacardi','vodka','eristoff','whisky','jack daniels','gin','bombay sapphire','pornstar martini'];
+    const house = ['witte rum','witte bacardi','bruine rum','bruine bacardi','vodka','wodka','eristof','eristoff','whisky','jack daniels','gin','bombay sapphire','pornstar martini','star martini'];
     return [...new Set([...house,...allProducts().flatMap(product => [product.name,...(product.aliases||[])])])]
       .map(value => String(value||'').trim()).filter(value => value && value.length <= 80).slice(0,500);
   }
@@ -87,23 +87,65 @@
       });
     });
     return parsed;`);
-  js=js.replace('    instance.maxAlternatives = 1;',`    instance.maxAlternatives = 3;
+  js=js.replace('    instance.maxAlternatives = 1;',`    instance.maxAlternatives = 5;
     try {
       const Phrase = window.SpeechRecognitionPhrase;
-      if (Phrase && 'phrases' in instance) speechBiasPhrases().forEach(phrase => instance.phrases.push(new Phrase(phrase, 5.0)));
+      if (Phrase && 'phrases' in instance) {
+        const phraseObjects=speechBiasPhrases().map(phrase => new Phrase(phrase, phrase.toLowerCase().includes('erist') ? 8.0 : 5.0));
+        try { instance.phrases = phraseObjects; }
+        catch { phraseObjects.forEach(phrase => instance.phrases.push(phrase)); }
+      }
     } catch (error) { console.info('Contextuele spraakbias niet beschikbaar.', error); }`);
   js=js.replace(`        const text = event.results[i][0].transcript.trim();
         if (event.results[i].isFinal) handleFinalVoiceTranscript(text);
         else interimText += \`${'${text}'} \`;`,`        const alternatives = Array.from(event.results[i]);
-        const ranked = alternatives.map(alternative => ({text:alternative.transcript.trim(),score:parseVoiceProducts(alternative.transcript).length*100+Number(alternative.confidence||0)})).sort((a,b)=>b.score-a.score);
+        const ranked = alternatives.map(alternative => {
+          const corrected=normalizeVoiceText(alternative.transcript);
+          const hits=parseVoiceProducts(corrected).reduce((total,item)=>total+item.qty,0);
+          const eristoffBonus=/\\beristoff\\b/.test(corrected)?500:0;
+          return {text:corrected,score:hits*1000+eristoffBonus+Number(alternative.confidence||0)};
+        }).sort((a,b)=>b.score-a.score);
         const text = (ranked[0]?.text || alternatives[0]?.transcript || '').trim();
         if (event.results[i].isFinal) handleFinalVoiceTranscript(text);
         else interimText += \`${'${text}'} \`;`);
 
+  const voiceApiExport=`
+  window.__kassaVoiceApi = {
+    handle: typeof handleFinalVoiceTranscript === 'function' ? handleFinalVoiceTranscript : null,
+    parse: typeof parseVoiceProducts === 'function' ? parseVoiceProducts : null,
+    preview: text => {
+      if (typeof parseVoiceProducts !== 'function' || typeof renderVoiceDraft !== 'function') return;
+      voiceInterim = parseVoiceProducts(text);
+      renderVoiceDraft();
+    },
+    clearPreview: () => {
+      if (typeof renderVoiceDraft !== 'function') return;
+      voiceInterim = [];
+      if (typeof voiceIgnored !== 'undefined' && voiceIgnored?.clear) voiceIgnored.clear();
+      renderVoiceDraft();
+    },
+    phrases: typeof speechBiasPhrases === 'function' ? speechBiasPhrases : () => [],
+    products: () => typeof allProducts === 'function' ? allProducts() : (typeof PRODUCTS !== 'undefined' ? PRODUCTS : []),
+    serverUrl: () => {
+      try {
+        if (typeof getServerUrl === 'function') return getServerUrl() || '';
+        if (typeof getAiServerUrl === 'function') return getAiServerUrl() || '';
+      } catch {}
+      return localStorage.getItem('registratiekassa-server-url') || localStorage.getItem('registratiekassa-ai-server-url') || '';
+    }
+  };
+`;
+  js=js.replace(/(\n\s*)function configureRecognition\(\)/,(match,indent)=>`${voiceApiExport}${indent}function configureRecognition()`);
+
+  const [appleCss,voiceController]=await Promise.all([
+    fetchText('apple-fixes.css'),
+    fetchText('voice-controller.js')
+  ]);
   const style=document.createElement('style');
-  style.textContent=css;
+  style.textContent=css+'\n'+appleCss;
   document.head.appendChild(style);
   (0,eval)(js);
+  (0,eval)(voiceController);
 })().catch(error=>{
   document.body.innerHTML=`<pre style="color:white;background:#07101b;padding:20px;white-space:pre-wrap">Registratiekassa kon niet starten:\n${error.stack||error}</pre>`;
 });
