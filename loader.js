@@ -10,7 +10,7 @@
     const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
     return new Response(stream).text();
   };
-  const appParts=Array.from({length:7},(_,index)=>`assets/app-sync.${String(index+1).padStart(2,'0')}.b64`);
+  const appParts=Array.from({length:7},(_,index)=>`assets/app.full.${String(index+1).padStart(2,'0')}.b64`);
   const [cssB64,jsParts]=await Promise.all([
     fetchText('assets/styles.css.gz.b64'),
     Promise.all(appParts.map(fetchText))
