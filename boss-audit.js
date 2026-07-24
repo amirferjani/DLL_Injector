@@ -54,12 +54,39 @@
   const productById=id=>api.getProduct?.(id)||products().find(product=>String(product.id)===String(id))||null;
   const tableLabel=id=>api.getTable?.(id)?.label||id||'Onbekend';
   const session=()=>api.getSession?.()||{};
-  const actorFrom=(...objects)=>{
+  const explicitActorFrom=(...objects)=>{
+    for(const candidate of objects){
+      if(!candidate||typeof candidate!=='object') continue;
+      const actorId=candidate.lastEditedBy||candidate.updatedBy||candidate.removedBy||candidate.sentBy||candidate.addedBy||candidate.actorId||candidate.userId;
+      const actorName=candidate.lastEditedByName||candidate.updatedByName||candidate.removedByName||candidate.sentByName||candidate.addedByName||candidate.actorName||candidate.userName;
+      if(actorId||actorName){
+        const id=String(actorId||actorName);
+        return {actorId:id,actorName:String(actorName||staffList().find(person=>String(person.id)===id)?.name||id),role:candidate.role||'team'};
+      }
+    }
+    return null;
+  };
+  const historicalActorFrom=(...objects)=>{
+    const explicit=explicitActorFrom(...objects);
+    if(explicit) return explicit;
+    for(const candidate of objects){
+      if(!candidate||typeof candidate!=='object') continue;
+      const actorId=candidate.staffId||candidate.createdBy||candidate.employeeId;
+      const actorName=candidate.staffName||candidate.createdByName||candidate.employeeName;
+      if(actorId||actorName){
+        const id=String(actorId||actorName);
+        return {actorId:id,actorName:String(actorName||staffList().find(person=>String(person.id)===id)?.name||id),role:candidate.role||'team'};
+      }
+    }
     const current=session();
-    const candidate=objects.find(Boolean)||{};
-    const actorId=candidate.lastEditedBy||candidate.updatedBy||candidate.addedBy||candidate.staffId||candidate.actorId||current.id||'unknown';
-    const actorName=candidate.lastEditedByName||candidate.updatedByName||candidate.addedByName||candidate.staffName||candidate.actorName||staffList().find(person=>String(person.id)===String(actorId))?.name||current.name||'Onbekend';
-    return {actorId:String(actorId),actorName:String(actorName),role:current.role||candidate.role||'team'};
+    return {actorId:String(current.id||'unknown'),actorName:String(current.name||'Onbekend'),role:current.role||'team'};
+  };
+  const liveActorFrom=(...objects)=>{
+    const explicit=explicitActorFrom(...objects);
+    if(explicit) return explicit;
+    const current=session();
+    if(current.id||current.name) return {actorId:String(current.id||current.name),actorName:String(current.name||current.id),role:current.role||'team'};
+    return historicalActorFrom(...objects);
   };
 
   const actionMeta={
@@ -90,7 +117,7 @@
   }
 
   function appendEvent(data){
-    const actor=actorFrom(data.entity,data.item,data.order);
+    const actor=data.historical?historicalActorFrom(data.entity,data.item,data.order):liveActorFrom(data.entity,data.item);
     const event={
       id:data.id||uid(),
       ts:Number(data.ts)||now(),
@@ -114,7 +141,7 @@
       note:data.note||'',
       details:data.details&&typeof data.details==='object'?clone(data.details):{}
     };
-    const duplicate=events.slice(-30).some(old=>old.action===event.action&&old.orderId===event.orderId&&old.productId===event.productId&&old.qty===event.qty&&Math.abs(old.ts-event.ts)<250);
+    const duplicate=events.slice(-30).some(old=>old.action===event.action&&old.orderId===event.orderId&&old.productId===event.productId&&old.qty===event.qty&&old.beforeQty===event.beforeQty&&old.afterQty===event.afterQty&&old.source===event.source&&Math.abs(old.ts-event.ts)<40);
     if(duplicate) return null;
     events.push(event);
     persistEvents();
@@ -279,6 +306,8 @@
         orderId:payment.orderId||payment.ticketId||'',
         amount:payment.amount,
         method:payment.method,
+        actorId:payment.staffId||payment.actorId||payment.userId||'',
+        actorName:payment.staffName||payment.actorName||payment.userName||'',
         entity:payment,
         details:{items:clone(payment.items||[])}
       });
@@ -309,10 +338,10 @@
     Object.entries(state.orders||{}).forEach(([tableId,order])=>{
       const orderId=String(order?.id||order?.orderId||`table:${tableId}`);
       if(knownOrders.has(orderId)) return;
-      appendEvent({action:'imported_snapshot',ts:order?.openedAt||now(),tableId,orderId,order,entity:order,note:'Stand aanwezig vóór het herstelde logboek'});
+      appendEvent({action:'imported_snapshot',ts:order?.openedAt||now(),tableId,orderId,order,entity:order,historical:true,note:'Stand aanwezig vóór het herstelde logboek'});
       (order?.items||[]).forEach(item=>{
         const qty=Number(item.qty||item.quantity||0);
-        if(qty>0) appendEvent({action:'item_add',ts:item.addedAt||order?.openedAt||now(),tableId,orderId,productId:item.productId||item.id,qty,beforeQty:0,afterQty:qty,item,order,entity:item,note:'Bestaande bestellijn geïmporteerd'});
+        if(qty>0) appendEvent({action:'item_add',ts:item.addedAt||order?.openedAt||now(),tableId,orderId,productId:item.productId||item.id,qty,beforeQty:0,afterQty:qty,item,order,entity:item,historical:true,note:'Bestaande bestellijn geïmporteerd'});
       });
     });
   }
