@@ -1,5 +1,5 @@
 {
-  "startedAt": "2026-07-24T22:41:50.286Z",
+  "startedAt": "2026-07-24T22:43:45.470Z",
   "passed": false,
   "checks": [
     {
@@ -25,6 +25,6 @@
     "acceptedAudits": 1,
     "acceptedPayments": 0
   },
-  "finishedAt": "2026-07-24T22:41:51.702Z",
+  "finishedAt": "2026-07-24T22:43:46.711Z",
   "failure": "Error: Eén tik opent als Baas nog steeds productgeschiedenis\n    at check (file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v18.mjs:18:21)\n    at file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v18.mjs:128:3\n    at runNextTicks (node:internal/process/task_queues:60:5)\n    at process.processImmediate (node:internal/timers:454:9)\n    at process.callbackTrampoline (node:internal/async_hooks:130:17)"
 }
