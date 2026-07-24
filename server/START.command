@@ -40,7 +40,7 @@ if not parts:
 encoded = ''.join(path.read_text('utf-8').strip() for path in parts)
 Path('kassa_server.py').write_bytes(gzip.decompress(base64.b64decode(encoded)))
 PY
-chmod 700 kassa_server.py dutch_transcriber.py
+chmod 700 kassa_server.py dutch_transcriber.py watchdog.py
 
 if [[ ! -f .env ]]; then
   echo "Eerste configuratie van Registratiekassa."
@@ -146,6 +146,15 @@ echo "Tailscale Serve wordt privé binnen je tailnet via HTTPS ingesteld…"
 "$TS" serve --bg --https=443 "127.0.0.1:$PORT"
 "$TS" serve --bg --https=8443 "127.0.0.1:$TRANSCRIBE_PORT"
 
+if [[ -f .watchdog.pid ]] && kill -0 "$(cat .watchdog.pid)" 2>/dev/null; then
+  echo "De verbindingswatchdog draait al met PID $(cat .watchdog.pid)."
+else
+  nohup "$PY" watchdog.py >> watchdog.log 2>&1 &
+  echo $! > .watchdog.pid
+  sleep 1
+  echo "De verbindingswatchdog is gestart met PID $(cat .watchdog.pid)."
+fi
+
 echo
 "$TS" serve status || true
 
@@ -159,6 +168,7 @@ if [[ -n "$DNS_NAME" ]]; then
   echo "Nederlandse transcriptie: https://$DNS_NAME:8443"
   echo "Kassa: $APP_URL"
   echo "Database: $(pwd)/registratiekassa.sqlite3"
+  echo "Watchdoglog: $(pwd)/watchdog.log"
   echo "De servers zijn alleen bereikbaar voor toegelaten apparaten in je Tailscale-netwerk."
   open "$APP_URL"
 else
@@ -166,4 +176,4 @@ else
 fi
 
 echo
-read "?Alles draait. Druk Enter om dit venster te sluiten; de servers blijven actief."
+read "?Alles draait. Druk Enter om dit venster te sluiten; servers en watchdog blijven actief."
