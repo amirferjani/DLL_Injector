@@ -109,7 +109,7 @@
         if (event.results[i].isFinal) handleFinalVoiceTranscript(text);
         else interimText += \`${'${text}'} \`;`);
 
-  const voiceApiExport=`
+  const runtimeApiExport=`
   window.__kassaVoiceApi = {
     handle: typeof handleFinalVoiceTranscript === 'function' ? handleFinalVoiceTranscript : null,
     parse: typeof parseVoiceProducts === 'function' ? parseVoiceProducts : null,
@@ -134,18 +134,34 @@
       return localStorage.getItem('registratiekassa-server-url') || localStorage.getItem('registratiekassa-ai-server-url') || '';
     }
   };
+  window.__kassaAppApi = {
+    getState: () => typeof state !== 'undefined' ? state : null,
+    getSession: () => typeof session !== 'undefined' ? session : null,
+    getSelectedTableId: () => typeof selectedTableId !== 'undefined' ? selectedTableId : null,
+    getProduct: id => typeof getProduct === 'function' ? getProduct(id) : null,
+    getProducts: () => typeof allProducts === 'function' ? allProducts() : (typeof PRODUCTS !== 'undefined' ? PRODUCTS : []),
+    getStaff: () => typeof STAFF !== 'undefined' ? STAFF : [],
+    getTable: id => typeof tableDef === 'function' ? tableDef(id) : null,
+    getOrder: id => typeof orderFor === 'function' ? orderFor(id) : null,
+    save: () => { if (typeof saveState === 'function') saveState(); },
+    render: () => { if (typeof renderAll === 'function') renderAll(); },
+    toast: message => { if (typeof showToast === 'function') showToast(message); }
+  };
 `;
-  js=js.replace(/(\n\s*)function configureRecognition\(\)/,(match,indent)=>`${voiceApiExport}${indent}function configureRecognition()`);
+  js=js.replace(/(\n\s*)function configureRecognition\(\)/,(match,indent)=>`${runtimeApiExport}${indent}function configureRecognition()`);
 
-  const [appleCss,voiceController]=await Promise.all([
+  const [appleCss,voiceController,bossAuditCss,bossAudit]=await Promise.all([
     fetchText('apple-fixes.css'),
-    fetchText('voice-controller.js')
+    fetchText('voice-controller.js'),
+    fetchText('boss-audit.css'),
+    fetchText('boss-audit.js')
   ]);
   const style=document.createElement('style');
-  style.textContent=css+'\n'+appleCss;
+  style.textContent=css+'\n'+appleCss+'\n'+bossAuditCss;
   document.head.appendChild(style);
   (0,eval)(js);
   (0,eval)(voiceController);
+  (0,eval)(bossAudit);
 })().catch(error=>{
   document.body.innerHTML=`<pre style="color:white;background:#07101b;padding:20px;white-space:pre-wrap">Registratiekassa kon niet starten:\n${error.stack||error}</pre>`;
 });
