@@ -1,12 +1,14 @@
 # Registratiekassa · Café De Zoo
 
-Webapp voor tafelbeheer, bestellingen, betalingen en live Nederlandstalige spraakinvoer.
+Webapp voor tafelbeheer, bestellingen, betalingen, live Nederlandstalige spraakinvoer en gedeelde kassadata via een lokale Mac/Tailscale-server.
 
 ## Openen
 
 Na GitHub Pages-deployment staat de app normaal op:
 
 `https://amirferjani.github.io/DLL_Injector/`
+
+De repository is momenteel nog privé; de publieke Pages-link werkt pas nadat GitHub Pages voor de repository is geactiveerd en het gekozen GitHub-abonnement private Pages ondersteunt, of nadat de repository openbaar is gemaakt.
 
 ## Werking
 
@@ -16,9 +18,15 @@ Na GitHub Pages-deployment staat de app normaal op:
 - Op telefoon staan de delen onder elkaar en springt de app na tafelkeuze naar de bestelling.
 - Spraak gebruikt standaard dezelfde geverifieerde aanpak als de onderzochte Flowchart-versie: browsertranscriptie plus lokale controle tegen de productkaart.
 - Voorlopig herkende producten verschijnen live met een kruisje om ze weg te laten.
-- Een externe OpenAI/Tailscale-server is alleen een optionele terugval wanneer de lokale herkenning niets betrouwbaar vindt.
-- Bestellingen worden lokaal op het apparaat bewaard en blijven offline beschikbaar.
+- Bestellingen blijven lokaal/offline bruikbaar.
+- Met `server/START.command` worden tafels en rekeningen via SQLite/WAL en Tailscale tussen Mac, gsm en iPad gesynchroniseerd.
+- Gelijktijdige verouderde wijzigingen worden als conflict gemeld in plaats van stil te worden overschreven.
+- OpenAI is alleen een optionele terugval wanneer de lokale spraakcontrole niets betrouwbaar herkent.
+
+## Server starten
+
+Download de repository als ZIP, open de map `server` en dubbelklik op `START.command`. Het script gebruikt alleen Python 3 en Tailscale; externe Python- of Node-pakketten zijn niet nodig.
 
 ## Belangrijk
 
-Dit is een test- en bedieningsprototype, geen gecertificeerd Belgisch GKS/fiscaal kassasysteem. GitHub Pages levert alleen statische hosting; meerdere apparaten synchroniseren niet automatisch met elkaar zonder aparte server/database.
+Dit is een test- en bedieningsprototype, geen gecertificeerd Belgisch GKS/fiscaal kassasysteem. Voor productiegebruik zijn verdere controles, fiscale/GKS-integratie en operationele beveiligingsvalidatie nodig.
