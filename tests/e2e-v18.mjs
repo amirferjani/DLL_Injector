@@ -11,6 +11,7 @@ const report = {
   passed: false,
   checks: [],
   browserErrors: [],
+  expectedNetworkErrors: [],
   fakeServer: { syncCalls: 0, acceptedMutations: 0, acceptedAudits: 0, acceptedPayments: 0 },
 };
 
@@ -103,7 +104,10 @@ try {
   const page = await context.newPage();
   page.on('pageerror', error => report.browserErrors.push(String(error)));
   page.on('console', message => {
-    if (message.type() === 'error') report.browserErrors.push(`console: ${message.text()}`);
+    if (message.type() !== 'error') return;
+    const text = message.text();
+    if (!serverAvailable && /ERR_INTERNET_DISCONNECTED|Failed to fetch/i.test(text)) report.expectedNetworkErrors.push(text);
+    else report.browserErrors.push(`console: ${text}`);
   });
 
   await page.goto(`${baseUrl}/?test=v18`, { waitUntil: 'domcontentloaded' });
@@ -118,7 +122,7 @@ try {
   await page.waitForFunction(() => document.querySelector('#serverButton')?.dataset.connectionState === 'online', null, { timeout: 20000 });
   check('Testserver wordt als online weergegeven', true);
 
-  const table = page.locator('.table-button').filter({ hasText: /^K10$/ }).first();
+  const table = page.locator('.table-button[title*="Tafel K10"]').first();
   await table.click();
   await page.locator('#orderContent:not(.hidden)').waitFor();
   const product = page.locator('.product-tile').filter({ hasText: 'Aperol Spritz' }).first();
@@ -178,7 +182,7 @@ try {
   await page.evaluate(() => localStorage.removeItem('registratiekassa-zoo-v1'));
   await page.reload({ waitUntil: 'domcontentloaded' });
   await page.locator('#app:not(.hidden)').waitFor({ timeout: 15000 });
-  await page.locator('.table-button').filter({ hasText: /^K10$/ }).first().click();
+  await page.locator('.table-button[title*="Tafel K10"]').first().click();
   await page.locator('#orderContent:not(.hidden)').waitFor();
   await page.locator('#ticketList .qty-button').first().waitFor();
   check('IndexedDB-veiligheidskopie herstelt bestelling bij offline reload', (await page.locator('#ticketList .qty-button').first().textContent())?.trim() === '2×');
@@ -191,12 +195,12 @@ try {
   check('Fake SQLite/Tailscale-server ontving mutaties', report.fakeServer.acceptedMutations > 0, JSON.stringify(report.fakeServer));
 
   await page.screenshot({ path: `${resultsDir}/v18-mobile.png`, fullPage: true });
-  check('Geen JavaScript-paginafouten', report.browserErrors.length === 0, report.browserErrors.join(' | '));
+  check('Geen onverwachte JavaScript-paginafouten', report.browserErrors.length === 0, report.browserErrors.join(' | '));
 
   report.passed = true;
   report.finishedAt = new Date().toISOString();
   writeFileSync(`${resultsDir}/v18-report.json`, JSON.stringify(report, null, 2));
-  writeFileSync(`${resultsDir}/v18-report.md`, `# Registratiekassa v18 — E2E-test\n\n**Resultaat: GESLAAGD**\n\n${report.checks.map(item => `- ✅ ${item.name}${item.details ? ` — ${item.details}` : ''}`).join('\n')}\n\nFake server: \`${JSON.stringify(report.fakeServer)}\`\n`);
+  writeFileSync(`${resultsDir}/v18-report.md`, `# Registratiekassa v18 — E2E-test\n\n**Resultaat: GESLAAGD**\n\n${report.checks.map(item => `- ✅ ${item.name}${item.details ? ` — ${item.details}` : ''}`).join('\n')}\n\nVerwachte offline netwerkfouten: ${report.expectedNetworkErrors.length}.\n\nFake server: \`${JSON.stringify(report.fakeServer)}\`\n`);
 } catch (error) {
   report.passed = false;
   report.finishedAt = new Date().toISOString();
