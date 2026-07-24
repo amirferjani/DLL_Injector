@@ -1,15 +1,19 @@
 #!/bin/zsh
 set -u
 cd "$(dirname "$0")"
-if [[ -f .server.pid ]]; then
-  PID="$(cat .server.pid)"
-  kill "$PID" 2>/dev/null || true
-  rm -f .server.pid
-fi
+for PID_FILE in .server.pid .transcriber.pid; do
+  if [[ -f "$PID_FILE" ]]; then
+    PID="$(cat "$PID_FILE")"
+    kill "$PID" 2>/dev/null || true
+    rm -f "$PID_FILE"
+  fi
+done
 if command -v tailscale >/dev/null 2>&1; then
   tailscale serve --https=443 off || true
+  tailscale serve --https=8443 off || true
 elif [[ -x "/Applications/Tailscale.app/Contents/MacOS/Tailscale" ]]; then
   "/Applications/Tailscale.app/Contents/MacOS/Tailscale" serve --https=443 off || true
+  "/Applications/Tailscale.app/Contents/MacOS/Tailscale" serve --https=8443 off || true
 fi
-echo "Registratiekassa-server gestopt."
+echo "Registratiekassa en Nederlandse transcriptieserver gestopt."
 read "?Druk Enter om te sluiten."
