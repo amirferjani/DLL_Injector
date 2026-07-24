@@ -25,7 +25,7 @@ De gewone live spraak werkt al zonder API-sleutel via browsertranscriptie en lok
 5. Kies één keer de Baas-PIN. Extra AI mag je overslaan.
 6. Tailscale kan één keer vragen om HTTPS voor Serve toe te staan.
 
-Het script bouwt de Python-server automatisch uit `backend.01.b64`, `backend.02.b64` en `backend.03.b64`, start SQLite en opent daarna de kassalink met de server al ingesteld.
+Het script bouwt de Python-server automatisch uit `kassa-core.01.b64`, `kassa-core.02.b64` en `kassa-core.03.b64`, start SQLite en opent daarna de kassalink met de server al ingesteld. Er zijn geen npm-, pip- of andere pakketinstallaties nodig.
 
 ## Stoppen
 
