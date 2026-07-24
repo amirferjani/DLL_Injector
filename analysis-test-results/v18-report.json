@@ -1,6 +1,6 @@
 {
-  "startedAt": "2026-07-24T22:48:23.188Z",
-  "passed": false,
+  "startedAt": "2026-07-24T22:52:09.778Z",
+  "passed": true,
   "checks": [
     {
       "name": "Baaslogin werkt",
@@ -70,29 +70,40 @@
     {
       "name": "Verbindingsfout krijgt backoff en blijft bewaard",
       "ok": true,
-      "details": "{\"lastError\":\"Failed to fetch\",\"nextRetryAt\":1784933310962,\"failureCount\":3}"
+      "details": "{\"lastError\":\"Failed to fetch\",\"nextRetryAt\":1784933535272,\"failureCount\":2}"
+    },
+    {
+      "name": "IndexedDB-veiligheidskopie herstelt bestelling bij offline reload",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Wachtrij wordt na verbindingsherstel bevestigd en geleegd",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Fake SQLite/Tailscale-server ontving mutaties",
+      "ok": true,
+      "details": "{\"syncCalls\":5,\"acceptedMutations\":3,\"acceptedAudits\":4,\"acceptedPayments\":0}"
+    },
+    {
+      "name": "Geen onverwachte JavaScript-paginafouten",
+      "ok": true,
+      "details": ""
     }
   ],
-  "browserErrors": [
-    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
-    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
-    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
-    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
-    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
-    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
-    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
-    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
-    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
-    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
-    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
-    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED"
+  "browserErrors": [],
+  "expectedNetworkErrors": [
+    "Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "Failed to load resource: net::ERR_INTERNET_DISCONNECTED"
   ],
   "fakeServer": {
-    "syncCalls": 4,
-    "acceptedMutations": 2,
-    "acceptedAudits": 2,
+    "syncCalls": 5,
+    "acceptedMutations": 3,
+    "acceptedAudits": 4,
     "acceptedPayments": 0
   },
-  "finishedAt": "2026-07-24T22:48:58.060Z",
-  "failure": "locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('.table-button').filter({ hasText: /^K10$/ }).first()\n\n    at /home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v18.mjs:181:76"
+  "finishedAt": "2026-07-24T22:52:14.960Z"
 }
