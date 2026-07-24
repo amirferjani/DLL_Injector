@@ -3,24 +3,16 @@
 **Resultaat: MISLUKT**
 
 ```
-locator.fill: Timeout 30000ms exceeded.
+locator.click: Timeout 30000ms exceeded.
 Call log:
-  - waiting for locator('#bossPin')
-    - locator resolved to <input id="bossPin" maxlength="4" placeholder="PIN" inputmode="numeric"/>
-    - fill("0607")
-  - attempting fill action
-    2 × waiting for element to be visible, enabled and editable
-      - element is not visible
-    - retrying fill action
-    - waiting 20ms
-    2 × waiting for element to be visible, enabled and editable
-      - element is not visible
-    - retrying fill action
-      - waiting 100ms
-    60 × waiting for element to be visible, enabled and editable
-       - element is not visible
-     - retrying fill action
-       - waiting 500ms
+  - waiting for locator('.product-tile').filter({ hasText: 'Aperol Spritz' }).first()
+    - locator resolved to <button data-product="p1" class="product-tile">…</button>
+  - attempting click action
+    - waiting for element to be visible, enabled and stable
+    - element is visible, enabled and stable
+    - scrolling into view if needed
+    - done scrolling
+    - performing click action
 
-    at /home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v18.mjs:106:34
+    at /home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v18.mjs:120:17
 ```

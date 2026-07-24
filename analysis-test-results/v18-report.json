@@ -1,7 +1,18 @@
 {
-  "startedAt": "2026-07-24T22:35:47.299Z",
+  "startedAt": "2026-07-24T22:39:18.571Z",
   "passed": false,
-  "checks": [],
+  "checks": [
+    {
+      "name": "Baaslogin werkt",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Testserver wordt als online weergegeven",
+      "ok": true,
+      "details": ""
+    }
+  ],
   "browserErrors": [],
   "fakeServer": {
     "syncCalls": 0,
@@ -9,6 +20,6 @@
     "acceptedAudits": 0,
     "acceptedPayments": 0
   },
-  "finishedAt": "2026-07-24T22:36:17.618Z",
-  "failure": "locator.fill: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('#bossPin')\n    - locator resolved to <input id=\"bossPin\" maxlength=\"4\" placeholder=\"PIN\" inputmode=\"numeric\"/>\n    - fill(\"0607\")\n  - attempting fill action\n    2 × waiting for element to be visible, enabled and editable\n      - element is not visible\n    - retrying fill action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and editable\n      - element is not visible\n    - retrying fill action\n      - waiting 100ms\n    60 × waiting for element to be visible, enabled and editable\n       - element is not visible\n     - retrying fill action\n       - waiting 500ms\n\n    at /home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v18.mjs:106:34"
+  "finishedAt": "2026-07-24T22:39:49.112Z",
+  "failure": "locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('.product-tile').filter({ hasText: 'Aperol Spritz' }).first()\n    - locator resolved to <button data-product=\"p1\" class=\"product-tile\">…</button>\n  - attempting click action\n    - waiting for element to be visible, enabled and stable\n    - element is visible, enabled and stable\n    - scrolling into view if needed\n    - done scrolling\n    - performing click action\n\n    at /home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v18.mjs:120:17"
 }
