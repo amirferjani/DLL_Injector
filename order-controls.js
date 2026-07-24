@@ -19,6 +19,9 @@
     ''
   );
 
+  const rowForProduct=productId=>[...document.querySelectorAll('#ticketList [data-ticket-row]')]
+    .find(row=>productIdFor(row)===String(productId))||null;
+
   function pulse(row,tone='plus'){
     if(!row) return;
     row.classList.remove('rk-quick-plus','rk-quick-minus');
@@ -30,22 +33,25 @@
 
   function addOne(productId,row){
     api.addProduct?.(productId,1,'double-tap');
-    pulse(row,'plus');
+    pulse(rowForProduct(productId)||row,'plus');
   }
 
   function subtractOne(productId,row){
     api.changeQuantity?.(productId,-1,'quick-minus');
-    pulse(row,'minus');
+    pulse(rowForProduct(productId)||row,'minus');
   }
 
-  function replaySingleHistoryClick(content){
+  function replaySingleHistoryClick(productId,fallbackContent){
     const isBoss=api.getSession?.()?.role==='boss';
-    if(!isBoss||!content?.isConnected) return;
-    const historyButton=content.closest('[data-ticket-row]')?.querySelector('.item-history-button');
+    if(!isBoss) return;
+    const currentRow=rowForProduct(productId);
+    const historyButton=currentRow?.querySelector('.item-history-button');
     if(historyButton){
       historyButton.click();
       return;
     }
+    const content=currentRow?.querySelector('.ticket-history-target')||fallbackContent;
+    if(!content?.isConnected) return;
     syntheticHistoryClick=true;
     try{
       content.dispatchEvent(new MouseEvent('click',{bubbles:false,cancelable:true,view:window}));
@@ -59,7 +65,7 @@
     const current=pendingTap;
     pendingTap=null;
     clearTimeout(current.timer);
-    replaySingleHistoryClick(current.content);
+    replaySingleHistoryClick(current.productId,current.content);
   }
 
   function handleLineContentClick(event){
