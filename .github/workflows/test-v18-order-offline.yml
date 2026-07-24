@@ -54,4 +54,4 @@ jobs:
           git commit -m "Record v18 real-browser test results" || exit 0
           git push origin HEAD:analysis/materialized-source-2026-07-25
 
-# Retry 4: route a delayed boss single tap through the existing history button.
+# Retry 5: resolve the current product row again after a synchronization rerender.
