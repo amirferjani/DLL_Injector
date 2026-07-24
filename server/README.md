@@ -1,6 +1,8 @@
-# Beveiligde AI-server via Tailscale
+# Optionele extra AI via Tailscale
 
-Deze server houdt de OpenAI API-sleutel op de Mac. De openbare GitHub Pages-app krijgt de sleutel nooit te zien.
+De geverifieerde Flowchart-spraakwerking heeft deze server niet nodig: browsertranscriptie en lokale productcontrole werken rechtstreeks in de webapp.
+
+Deze server is alleen een extra terugval voor zinnen die de lokale parser niet betrouwbaar begrijpt. De OpenAI API-sleutel blijft op de Mac en wordt nooit naar GitHub Pages gestuurd.
 
 ## Starten op macOS
 
@@ -11,7 +13,7 @@ Deze server houdt de OpenAI API-sleutel op de Mac. De openbare GitHub Pages-app 
 5. Vul één keer de OpenAI API-sleutel in.
 6. Tailscale kan één keer een toestemmingspagina openen om HTTPS voor Serve te activeren.
 
-Daarna opent het script de kassa met de Tailscale-serverlink al ingesteld. De server luistert alleen op `127.0.0.1` en Tailscale Serve verzorgt HTTPS en tailnet-toegang.
+Daarna opent het script de kassa met de optionele Tailscale-serverlink ingesteld. De server luistert alleen op `127.0.0.1`; Tailscale Serve verzorgt HTTPS en toegang binnen het tailnet.
 
 ## Stoppen
 
@@ -19,4 +21,4 @@ Dubbelklik op `STOP.command`.
 
 ## Model
 
-Het model staat in `.env` als `OPENAI_MODEL`. Zodra het echte Flowchart-model bewezen is, kan die waarde worden aangepast zonder de appcode te wijzigen.
+Het uitbreidingsmodel staat in `.env` als `OPENAI_MODEL`. Dit is geen Flowchart-model: de onderzochte Flowchart-versie gebruikt helemaal geen extern AI-model. Het model kan later bewust worden gekozen voor de optionele terugval zonder de standaard lokale spraakwerking te veranderen.
