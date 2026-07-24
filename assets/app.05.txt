@@ -54,8 +54,106 @@
     return parseVoiceProducts(text).map(item => item.productId);
   }
 
-  function handleFinalVoiceTranscript(transcript) {
+  const AI_SERVER_KEY = 'registratiekassa-ai-server-url';
+
+  function normalizeServerUrl(value) {
+    const text = String(value || '').trim().replace(/\/+$/, '');
+    if (!text) return '';
+    try {
+      const url = new URL(text);
+      return url.protocol === 'https:' || url.hostname === '127.0.0.1' || url.hostname === 'localhost' ? url.origin : '';
+    } catch { return ''; }
+  }
+
+  function getAiServerUrl() {
+    return normalizeServerUrl(storageGet('local', AI_SERVER_KEY));
+  }
+
+  function refreshServerButton() {
+    const button = $('serverButton');
+    if (!button) return;
+    const connected = Boolean(getAiServerUrl());
+    button.textContent = connected ? 'AI verbonden' : 'AI-server';
+    button.classList.toggle('connected', connected);
+  }
+
+  async function configureAiServer() {
+    const current = getAiServerUrl();
+    const entered = prompt('Plak de Tailscale HTTPS-link van de kassaserver. Laat leeg om de AI-server te verwijderen.', current);
+    if (entered === null) return;
+    if (!entered.trim()) {
+      storageRemove('local', AI_SERVER_KEY);
+      refreshServerButton();
+      showToast('AI-server verwijderd; lokale spraak blijft werken.');
+      return;
+    }
+    const url = normalizeServerUrl(entered);
+    if (!url) return showToast('Gebruik een geldige HTTPS-link van Tailscale.');
+    try {
+      const response = await fetch(`${url}/health`, {headers:{Accept:'application/json'}});
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const health = await response.json();
+      if (!health.ok) throw new Error('server niet klaar');
+      storageSet('local', AI_SERVER_KEY, url);
+      refreshServerButton();
+      showToast(`AI-server verbonden${health.model ? ` · ${health.model}` : ''}.`);
+    } catch (error) {
+      showToast(`Server niet bereikbaar: ${error.message}`);
+    }
+  }
+
+  async function requestAiActions(transcript) {
+    const url = getAiServerUrl();
+    if (!url) return [];
+    const response = await fetch(`${url}/api/voice/parse`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json', Accept:'application/json'},
+      body: JSON.stringify({
+        transcript,
+        products: PRODUCTS.map(({id,name,aliases}) => ({id,name,aliases}))
+      })
+    });
+    if (!response.ok) {
+      const details = await response.text().catch(() => '');
+      throw new Error(details || `HTTP ${response.status}`);
+    }
+    const data = await response.json();
+    return Array.isArray(data.actions) ? data.actions : [];
+  }
+
+  function applyAiActions(actions) {
+    let changed = 0;
+    actions.forEach(action => {
+      const product = getProduct(action.productId);
+      const qty = Math.max(1, Math.min(25, Number(action.qty) || 1));
+      if (!product || voiceIgnored.has(product.id)) return;
+      if (action.type === 'remove') {
+        for (let i = 0; i < qty; i++) removeOneVoiceProduct(product.id);
+      } else {
+        addProduct(product.id, qty, 'ai-voice');
+      }
+      changed += qty;
+    });
+    return changed;
+  }
+
+  async function handleFinalVoiceTranscript(transcript) {
     $('voiceTranscript').textContent = transcript;
+    if (getAiServerUrl()) {
+      try {
+        const actions = await requestAiActions(transcript);
+        if (actions.length) {
+          const changed = applyAiActions(actions);
+          if (changed) showToast(`${changed} item(s) door AI verwerkt.`);
+          voiceInterim = [];
+          voiceIgnored.clear();
+          renderVoiceDraft();
+          return;
+        }
+      } catch {
+        showToast('AI tijdelijk niet bereikbaar; lokale herkenning gebruikt.');
+      }
+    }
     const removals = parseRemoval(transcript);
     if (removals.length) {
       removals.forEach(productId => removeOneVoiceProduct(productId));
