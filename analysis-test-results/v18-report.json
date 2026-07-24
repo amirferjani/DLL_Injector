@@ -1,5 +1,5 @@
 {
-  "startedAt": "2026-07-24T22:46:03.811Z",
+  "startedAt": "2026-07-24T22:48:23.188Z",
   "passed": false,
   "checks": [
     {
@@ -61,15 +61,38 @@
       "name": "Bediening blijft offline lokaal werken",
       "ok": true,
       "details": ""
+    },
+    {
+      "name": "Offline wijziging blijft in lokale synchronisatiewachtrij",
+      "ok": true,
+      "details": "queue=1"
+    },
+    {
+      "name": "Verbindingsfout krijgt backoff en blijft bewaard",
+      "ok": true,
+      "details": "{\"lastError\":\"Failed to fetch\",\"nextRetryAt\":1784933310962,\"failureCount\":3}"
     }
   ],
-  "browserErrors": [],
+  "browserErrors": [
+    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "console: Failed to load resource: net::ERR_INTERNET_DISCONNECTED"
+  ],
   "fakeServer": {
-    "syncCalls": 6,
-    "acceptedMutations": 4,
-    "acceptedAudits": 4,
+    "syncCalls": 4,
+    "acceptedMutations": 2,
+    "acceptedAudits": 2,
     "acceptedPayments": 0
   },
-  "finishedAt": "2026-07-24T22:46:07.164Z",
-  "failure": "Error: Offline wijziging blijft in lokale synchronisatiewachtrij: queue=0\n    at check (file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v18.mjs:18:21)\n    at file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v18.mjs:161:3"
+  "finishedAt": "2026-07-24T22:48:58.060Z",
+  "failure": "locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('.table-button').filter({ hasText: /^K10$/ }).first()\n\n    at /home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v18.mjs:181:76"
 }
