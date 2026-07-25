@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#0a1020">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <title>Registratiekassa vernieuwen</title>
+  <title>Registratiekassa herstellen</title>
   <style>html,body{margin:0;min-height:100%;background:#07101b;color:#fff;font-family:system-ui,-apple-system,sans-serif}main{min-height:100dvh;display:grid;place-items:center;padding:calc(env(safe-area-inset-top,0px) + 28px) 28px calc(env(safe-area-inset-bottom,0px) + 28px);text-align:center}div{max-width:540px}h1{font-size:28px}p{color:#b8c4d9;line-height:1.5}</style>
 </head>
 <body>
-<main><div><h1>Registratiekassa wordt vernieuwd…</h1><p>De oude PWA-cache wordt verwijderd. Bestellingen en loggegevens worden niet bewust gewist. Je wordt automatisch naar v18 gestuurd.</p></div></main>
+<main><div><h1>De nette kassaversie wordt hersteld…</h1><p>De mislukte mobiele vormgeving wordt uit de cache verwijderd. Bestellingen, rekeningen en loggegevens worden niet bewust gewist. De oorspronkelijke v18-indeling komt terug met alleen iets beter leesbare tekst.</p></div></main>
 <script>
 (async()=>{
   try{
@@ -22,7 +22,7 @@
       await Promise.all(keys.filter(key=>key.startsWith('registratiekassa-')).map(key=>caches.delete(key)));
     }
   }catch(error){console.warn(error);}
-  location.replace('./?fresh=order-offline-v18');
+  location.replace(`./?fresh=stable-layout-v21-${Date.now()}`);
 })();
 </script>
 </body>
