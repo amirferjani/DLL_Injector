@@ -7,6 +7,14 @@
     return;
   }
 
+  if(!document.querySelector('script[data-rk-mobile-recovery-v21]')){
+    const script=document.createElement('script');
+    script.src='mobile-recovery-v21.js';
+    script.defer=true;
+    script.dataset.rkMobileRecoveryV21='1';
+    document.head.appendChild(script);
+  }
+
   const button=()=>document.getElementById('serverButton');
   let lastHealthOkAt=0;
   let lastHealthError='';
