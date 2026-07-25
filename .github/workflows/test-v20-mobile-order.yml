@@ -13,6 +13,18 @@ on:
       - mobile-order-v20-refine.js
       - tests/e2e-v20-mobile-order.mjs
       - .github/workflows/test-v20-mobile-order.yml
+  pull_request:
+    branches:
+      - master
+    paths:
+      - index.html
+      - sw.js
+      - mobile-order-v20.css
+      - mobile-order-v20.js
+      - mobile-order-v20-refine.css
+      - mobile-order-v20-refine.js
+      - tests/e2e-v20-mobile-order.mjs
+      - .github/workflows/test-v20-mobile-order.yml
 
 permissions:
   contents: write
@@ -57,7 +69,7 @@ jobs:
         run: node tests/e2e-v20-mobile-order.mjs
 
       - name: Commit test evidence
-        if: always()
+        if: always() && github.event_name == 'push'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
