@@ -46,6 +46,12 @@ async function openPhone(browser, { name, width, height }) {
   await table.click();
   await page.locator('#orderContent:not(.hidden)').waitFor();
   await page.locator('#categoryRail [data-rk-catalog-proxy="favorites"]').waitFor({ timeout: 10000 });
+  await page.locator('#requestBillButton.rk-request-pill').waitFor({ timeout: 10000 });
+  await page.locator('.order-head-actions .order-history-button').waitFor({ timeout: 10000 });
+  await page.waitForFunction(() => {
+    const tab = document.querySelector('.catalog-tabs .catalog-tab');
+    return tab && getComputedStyle(tab).display === 'none';
+  }, null, { timeout: 10000 });
   await page.locator('.product-tile').first().waitFor();
   return { context, page };
 }
@@ -59,6 +65,7 @@ async function layoutMetrics(page) {
     const tabs = document.querySelector('.catalog-tabs');
     const search = document.querySelector('.product-search');
     const mic = document.querySelector('#voiceButton');
+    const request = document.querySelector('#requestBillButton');
     const actions = [...document.querySelectorAll('.order-head-actions > button')].filter(node => cs(node)?.display !== 'none');
     const actionTops = actions.map(node => Math.round(node.getBoundingClientRect().top));
     const checkout = [...document.querySelectorAll('.checkout-bar > button')].map(node => ({
@@ -81,8 +88,11 @@ async function layoutMetrics(page) {
       hasMore: [...document.querySelectorAll('button')].some(node => /^meer\b/i.test(node.textContent.trim())),
       hiddenOriginalTabs: [...document.querySelectorAll('.catalog-tabs .catalog-tab')].every(node => cs(node)?.display === 'none'),
       searchWidth: Math.round(search?.getBoundingClientRect().width || 0),
+      tabsWidth: Math.round(tabs?.getBoundingClientRect().width || 0),
       micDisplay: cs(mic)?.display || '',
       micWidth: Math.round(mic?.getBoundingClientRect().width || 0),
+      requestParent: request?.parentElement === document.querySelector('.order-head > div:first-child') ? 'title' : request?.parentElement?.className || '',
+      requestDisplay: cs(request)?.display || '',
       actionCount: actions.length,
       actionTops,
       checkout,
@@ -111,11 +121,12 @@ try {
     check('Favorieten, Alles en Recent zijn in dezelfde scrollrij aanwezig', ['Favorieten','Alles','Recent'].every(label => metrics.proxyLabels.includes(label)), JSON.stringify(metrics.proxyLabels));
     check('Er bestaat geen Meer-knop', !metrics.hasMore, String(metrics.hasMore));
     check('De oude grote catalogustabknoppen zijn verborgen', metrics.hiddenOriginalTabs, String(metrics.hiddenOriginalTabs));
-    check('Zoekveld vult de bestelbreedte', metrics.searchWidth >= 360, `${metrics.searchWidth}`);
+    check('Zoekveld vult zijn bestelrij', metrics.searchWidth >= metrics.tabsWidth * 0.9, `${metrics.searchWidth}/${metrics.tabsWidth}`);
     check('Start microfoon blijft zichtbaar', metrics.micDisplay !== 'none' && metrics.micWidth >= 115, `${metrics.micDisplay}/${metrics.micWidth}`);
-    check('Alle rekeningacties blijven zichtbaar', metrics.actionCount >= 4, `acties=${metrics.actionCount}`);
-    check('Rekeningacties staan in één compacte rij', new Set(metrics.actionTops).size === 1, JSON.stringify(metrics.actionTops));
-    check('Bestellen en betalen blijven naast elkaar zichtbaar', metrics.checkout.length === 2 && metrics.checkout.every(item => item.display !== 'none' && item.width >= 160) && new Set(metrics.checkout.map(item => item.top)).size === 1, JSON.stringify(metrics.checkout));
+    check('Rekening gevraagd blijft als aparte functie zichtbaar', metrics.requestParent === 'title' && metrics.requestDisplay !== 'none', `${metrics.requestParent}/${metrics.requestDisplay}`);
+    check('Plattegrond, Verplaats en Historiek blijven als drie actiekaarten zichtbaar', metrics.actionCount === 3, `acties=${metrics.actionCount}`);
+    check('De drie actiekaarten staan in één compacte rij', new Set(metrics.actionTops).size === 1, JSON.stringify(metrics.actionTops));
+    check('Bestellen en betalen blijven naast elkaar zichtbaar', metrics.checkout.length === 2 && metrics.checkout.every(item => item.display !== 'none' && item.width > 0) && new Set(metrics.checkout.map(item => item.top)).size === 1, JSON.stringify(metrics.checkout));
     check('Mobiele pagina heeft geen horizontale documentoverflow', metrics.docScrollWidth <= metrics.docWidth + 2, `${metrics.docScrollWidth}/${metrics.docWidth}`);
 
     const tile = page.locator('.product-tile').filter({ hasText: 'Aperol Spritz' }).first();
