@@ -1,0 +1,110 @@
+{
+  "startedAt": "2026-07-25T03:07:15.963Z",
+  "passed": true,
+  "checks": [
+    {
+      "name": "De oude v18 mobiele structuur blijft staan",
+      "ok": true,
+      "details": "{\"columns\":2,\"tileHeight\":82,\"productFont\":\"11.5px\",\"priceFont\":\"10.5px\",\"categoryFont\":\"9.5px\",\"searchFont\":\"11.5px\",\"viewFont\":\"12px\",\"floorHeight\":500,\"railParent\":\"order-main\",\"tabsVisible\":true,\"orderHeadParent\":\"orderContent\",\"docWidth\":390,\"docScrollWidth\":390}"
+    },
+    {
+      "name": "De drie bestaande catalogustabknoppen blijven zichtbaar",
+      "ok": true,
+      "details": "true"
+    },
+    {
+      "name": "De productkolommen zijn niet opnieuw ontworpen",
+      "ok": true,
+      "details": "kolommen=2"
+    },
+    {
+      "name": "De bestaande producttegelhoogte blijft vrijwel gelijk",
+      "ok": true,
+      "details": "hoogte=82"
+    },
+    {
+      "name": "Alleen de productnaam is bescheiden vergroot",
+      "ok": true,
+      "details": "11.5px"
+    },
+    {
+      "name": "De productprijs is bescheiden vergroot",
+      "ok": true,
+      "details": "10.5px"
+    },
+    {
+      "name": "De categorieletter is iets groter maar de rail blijft staan",
+      "ok": true,
+      "details": "9.5px"
+    },
+    {
+      "name": "Zoeken en hoofdweergaven zijn leesbaarder",
+      "ok": true,
+      "details": "11.5px/12px"
+    },
+    {
+      "name": "De tafelkaart is niet verkleind of heringedeeld",
+      "ok": true,
+      "details": "hoogte=500"
+    },
+    {
+      "name": "Geen horizontale documentoverflow",
+      "ok": true,
+      "details": "390/390"
+    },
+    {
+      "name": "Producttik springt niet terug naar de kaart",
+      "ok": true,
+      "details": "643→643"
+    },
+    {
+      "name": "Producttik verandert de gekozen tafel niet",
+      "ok": true,
+      "details": "K3→K3"
+    },
+    {
+      "name": "Producttik voegt nog steeds exact één toe",
+      "ok": true,
+      "details": "qty=1"
+    },
+    {
+      "name": "Min en kruis blijven aanwezig",
+      "ok": true,
+      "details": "min/x"
+    },
+    {
+      "name": "Desktopindeling blijft volledig onaangeraakt",
+      "ok": true,
+      "details": "{\"columns\":5,\"productFont\":\"10px\",\"priceFont\":\"9px\"}"
+    },
+    {
+      "name": "Geen onverwachte JavaScript-fouten",
+      "ok": true,
+      "details": ""
+    }
+  ],
+  "errors": [],
+  "metrics": {
+    "iphone390": {
+      "columns": 2,
+      "tileHeight": 82,
+      "productFont": "11.5px",
+      "priceFont": "10.5px",
+      "categoryFont": "9.5px",
+      "searchFont": "11.5px",
+      "viewFont": "12px",
+      "floorHeight": 500,
+      "railParent": "order-main",
+      "tabsVisible": true,
+      "orderHeadParent": "orderContent",
+      "docWidth": 390,
+      "docScrollWidth": 390
+    },
+    "desktop": {
+      "columns": 5,
+      "productFont": "10px",
+      "priceFont": "9px"
+    }
+  },
+  "finishedAt": "2026-07-25T03:07:18.777Z"
+}
