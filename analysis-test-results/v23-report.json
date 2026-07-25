@@ -1,0 +1,91 @@
+{
+  "startedAt": "2026-07-25T12:44:41.101Z",
+  "passed": false,
+  "checks": [
+    {
+      "name": "Telefoon krijgt de v23-layout",
+      "ok": true,
+      "details": "{\"mobileVersion\":\"23\",\"phoneClass\":true,\"columnAttribute\":\"4\",\"columns\":4,\"tileHeight\":88,\"tileNameFont\":\"13px\",\"tilePriceFont\":\"11.5px\",\"categoryDisplay\":\"flex\",\"categoryOverflowX\":\"auto\",\"categoryFont\":\"11.5px\",\"visibleActionButtons\":[\"Plattegrond\",\"Rekening gevraagd\",\"Verplaats\"],\"visibleTabs\":[\"Favorieten\",\"Alle producten\",\"Recent\"],\"voiceVisible\":true,\"documentWidth\":402,\"documentScrollWidth\":402}"
+    },
+    {
+      "name": "Gangbare iPhone gebruikt vier compacte kolommen",
+      "ok": true,
+      "details": "kolommen=4"
+    },
+    {
+      "name": "Productkaart blijft compact en minstens 88px hoog",
+      "ok": true,
+      "details": "88"
+    },
+    {
+      "name": "Productnaam blijft leesbaar zonder enorme kaart",
+      "ok": true,
+      "details": "13px"
+    },
+    {
+      "name": "Prijs blijft leesbaar",
+      "ok": true,
+      "details": "11.5px"
+    },
+    {
+      "name": "Categorieën zijn een horizontale schuifstrook",
+      "ok": true,
+      "details": "flex/auto"
+    },
+    {
+      "name": "Alle drie kaarttabbladen zijn tegelijk zichtbaar",
+      "ok": true,
+      "details": "[\"Favorieten\",\"Alle producten\",\"Recent\"]"
+    },
+    {
+      "name": "Microfoonknop blijft zichtbaar",
+      "ok": true,
+      "details": "voiceButton"
+    },
+    {
+      "name": "Rekeningacties staan naast elkaar en verdwijnen niet",
+      "ok": true,
+      "details": "[\"Plattegrond\",\"Rekening gevraagd\",\"Verplaats\"]"
+    },
+    {
+      "name": "Geen horizontale documentoverflow",
+      "ok": true,
+      "details": "402/402"
+    },
+    {
+      "name": "Product kan toegevoegd worden zonder naar de plattegrond te springen",
+      "ok": false,
+      "details": "0 -> 593"
+    }
+  ],
+  "browserErrors": [],
+  "metrics": {
+    "phone": {
+      "mobileVersion": "23",
+      "phoneClass": true,
+      "columnAttribute": "4",
+      "columns": 4,
+      "tileHeight": 88,
+      "tileNameFont": "13px",
+      "tilePriceFont": "11.5px",
+      "categoryDisplay": "flex",
+      "categoryOverflowX": "auto",
+      "categoryFont": "11.5px",
+      "visibleActionButtons": [
+        "Plattegrond",
+        "Rekening gevraagd",
+        "Verplaats"
+      ],
+      "visibleTabs": [
+        "Favorieten",
+        "Alle producten",
+        "Recent"
+      ],
+      "voiceVisible": true,
+      "documentWidth": 402,
+      "documentScrollWidth": 402
+    }
+  },
+  "failure": "Error: Product kan toegevoegd worden zonder naar de plattegrond te springen: 0 -> 593\n    at check (file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v23-mobile-layout.mjs:18:18)\n    at file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v23-mobile-layout.mjs:121:3",
+  "finishedAt": "2026-07-25T12:44:41.791Z"
+}
