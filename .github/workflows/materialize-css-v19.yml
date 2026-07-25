@@ -1,0 +1,35 @@
+name: Materialize current CSS for mobile audit
+
+on:
+  push:
+    branches:
+      - analysis/materialized-source-2026-07-25
+    paths:
+      - .github/workflows/materialize-css-v19.yml
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: analysis/materialized-source-2026-07-25
+      - name: Decode active stylesheet
+        run: |
+          mkdir -p analysis
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64, gzip
+          encoded = Path('assets/styles.css.gz.b64').read_text('utf-8').strip()
+          Path('analysis/materialized-styles.css').write_bytes(gzip.decompress(base64.b64decode(encoded)))
+          PY
+      - name: Commit decoded stylesheet
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add analysis/materialized-styles.css
+          git commit -m "Materialize active stylesheet for mobile audit" || exit 0
+          git push origin HEAD:analysis/materialized-source-2026-07-25
