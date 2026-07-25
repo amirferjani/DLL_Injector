@@ -116,9 +116,12 @@ try {
   check('Product kan toegevoegd worden zonder terug naar de plattegrond te springen', Math.abs(afterScroll - beforeScroll) < 80, `${beforeScroll} -> ${afterScroll}`);
 
   const qtyBefore = await phone.locator('#ticketList .qty-button').first().textContent();
-  const productContent = phone.locator('#ticketList .ticket-row > div').filter({ has: phone.locator('strong') }).first();
-  await productContent.dblclick({ delay: 80 });
-  await phone.waitForTimeout(250);
+  const quickAdd = phone.locator('#ticketList [data-quick-add]').first();
+  await quickAdd.waitFor({ timeout: 10000 });
+  await quickAdd.click();
+  await phone.waitForTimeout(110);
+  await quickAdd.click();
+  await phone.waitForTimeout(300);
   const qtyAfter = await phone.locator('#ticketList .qty-button').first().textContent();
   check('Bestaande dubbele-tikfunctie blijft werken', Number.parseInt(qtyAfter) === Number.parseInt(qtyBefore) + 1, `${qtyBefore} -> ${qtyAfter}`);
 
