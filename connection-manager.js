@@ -15,6 +15,21 @@
     document.head.appendChild(script);
   }
 
+  if(!document.querySelector('link[data-rk-mobile-layout-v23]')){
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href='mobile-layout-v23.css?v=23';
+    link.dataset.rkMobileLayoutV23='1';
+    document.head.appendChild(link);
+  }
+  if(!document.querySelector('script[data-rk-mobile-layout-v23]')){
+    const script=document.createElement('script');
+    script.src='mobile-layout-v23.js?v=23';
+    script.async=false;
+    script.dataset.rkMobileLayoutV23='1';
+    document.head.appendChild(script);
+  }
+
   const button=()=>document.getElementById('serverButton');
   let lastHealthOkAt=0;
   let lastHealthError='';
