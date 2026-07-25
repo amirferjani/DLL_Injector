@@ -1,6 +1,6 @@
 # Registratiekassa v23 — mobiele layouttest
 
-**Resultaat: MISLUKT**
+**Resultaat: GESLAAGD**
 
 - ✅ Telefoon krijgt de v23-layout — {"mobileVersion":"23","phoneClass":true,"columnAttribute":"4","columns":4,"tileHeight":88,"tileNameFont":"13px","tilePriceFont":"11.5px","categoryDisplay":"flex","categoryOverflowX":"auto","categoryFont":"11.5px","visibleActionButtons":["Plattegrond","Rekening gevraagd","Verplaats"],"visibleTabs":["Favorieten","Alle producten","Recent"],"voiceVisible":true,"documentWidth":402,"documentScrollWidth":402}
 - ✅ Gangbare iPhone gebruikt vier compacte kolommen — kolommen=4
@@ -12,13 +12,12 @@
 - ✅ Microfoonknop blijft zichtbaar — voiceButton
 - ✅ Rekeningacties staan naast elkaar en verdwijnen niet — ["Plattegrond","Rekening gevraagd","Verplaats"]
 - ✅ Geen horizontale documentoverflow — 402/402
-- ✅ Product kan toegevoegd worden zonder terug naar de plattegrond te springen — 632 -> 591
-- ❌ Bestaande dubbele-tikfunctie blijft werken — 1× -> 1×
+- ✅ Product kan toegevoegd worden zonder terug naar de plattegrond te springen — 593 -> 591
+- ✅ Bestaande dubbele-tikfunctie blijft werken — 1× -> 2×
+- ✅ Bestaand minteken blijft exact één verminderen — 2× -> 1×
+- ✅ Kleine iPhone gebruikt drie kolommen — {"columns":3,"width":350,"scrollWidth":350}
+- ✅ Kleine iPhone heeft geen horizontale overflow — 350/350
+- ✅ Desktop krijgt de telefoonlayout niet — {"phoneClass":false,"columns":5,"tileHeight":76}
+- ✅ Desktopdichtheid blijft behouden — kolommen=5
+- ✅ Geen onverwachte JavaScript-paginafouten
 
-## Fout
-
-```
-Error: Bestaande dubbele-tikfunctie blijft werken: 1× -> 1×
-    at check (file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v23-mobile-layout.mjs:18:18)
-    at file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v23-mobile-layout.mjs:123:3
-```

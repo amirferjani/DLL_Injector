@@ -1,6 +1,6 @@
 {
-  "startedAt": "2026-07-25T12:47:48.995Z",
-  "passed": false,
+  "startedAt": "2026-07-25T12:49:34.428Z",
+  "passed": true,
   "checks": [
     {
       "name": "Telefoon krijgt de v23-layout",
@@ -55,12 +55,42 @@
     {
       "name": "Product kan toegevoegd worden zonder terug naar de plattegrond te springen",
       "ok": true,
-      "details": "632 -> 591"
+      "details": "593 -> 591"
     },
     {
       "name": "Bestaande dubbele-tikfunctie blijft werken",
-      "ok": false,
-      "details": "1× -> 1×"
+      "ok": true,
+      "details": "1× -> 2×"
+    },
+    {
+      "name": "Bestaand minteken blijft exact één verminderen",
+      "ok": true,
+      "details": "2× -> 1×"
+    },
+    {
+      "name": "Kleine iPhone gebruikt drie kolommen",
+      "ok": true,
+      "details": "{\"columns\":3,\"width\":350,\"scrollWidth\":350}"
+    },
+    {
+      "name": "Kleine iPhone heeft geen horizontale overflow",
+      "ok": true,
+      "details": "350/350"
+    },
+    {
+      "name": "Desktop krijgt de telefoonlayout niet",
+      "ok": true,
+      "details": "{\"phoneClass\":false,\"columns\":5,\"tileHeight\":76}"
+    },
+    {
+      "name": "Desktopdichtheid blijft behouden",
+      "ok": true,
+      "details": "kolommen=5"
+    },
+    {
+      "name": "Geen onverwachte JavaScript-paginafouten",
+      "ok": true,
+      "details": ""
     }
   ],
   "browserErrors": [],
@@ -89,8 +119,17 @@
       "voiceVisible": true,
       "documentWidth": 402,
       "documentScrollWidth": 402
+    },
+    "smallPhone": {
+      "columns": 3,
+      "width": 350,
+      "scrollWidth": 350
+    },
+    "desktop": {
+      "phoneClass": false,
+      "columns": 5,
+      "tileHeight": 76
     }
   },
-  "failure": "Error: Bestaande dubbele-tikfunctie blijft werken: 1× -> 1×\n    at check (file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v23-mobile-layout.mjs:18:18)\n    at file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v23-mobile-layout.mjs:123:3",
-  "finishedAt": "2026-07-25T12:47:50.562Z"
+  "finishedAt": "2026-07-25T12:49:37.906Z"
 }
