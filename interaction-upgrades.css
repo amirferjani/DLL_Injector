@@ -15,6 +15,33 @@
 .server-button.rk-connection-offline::before{background:#ff7b8d;box-shadow:0 0 0 3px rgba(255,123,141,.15)}
 .server-button.rk-connection-conflict::before{background:#ff9d52;box-shadow:0 0 0 3px rgba(255,157,82,.18);animation:rk-connection-pulse .9s infinite}
 @keyframes rk-connection-pulse{50%{opacity:.35;transform:translateY(-50%) scale(.78)}}
+
+/*
+ * v21: alleen een bescheiden lettervergroting op aanraaktoestellen.
+ * Geen kolommen, kaartposities, knoppenrijen, categorieplaatsing, hoogtes of
+ * scrollstructuur worden hier gewijzigd.
+ */
+@media (hover:none) and (pointer:coarse) and (max-width:900px){
+  .view-switch{font-size:12px!important}
+  .order-head-actions .soft-button,.order-history-button{font-size:12px!important}
+  .voice-live-bar strong{font-size:13px!important}
+  .voice-live-bar small{font-size:11px!important}
+  .voice-action{font-size:12px!important}
+  .catalog-tab{font-size:11px!important}
+  .product-search input{font-size:11.5px!important}
+  .category-button{font-size:9.5px!important;line-height:1.15!important}
+  .product-tile strong{font-size:11.5px!important;line-height:1.18!important}
+  .product-tile span{font-size:10.5px!important}
+  .ticket-header strong{font-size:15px!important}
+  .ticket-row strong{font-size:12.5px!important;line-height:1.2!important}
+  .ticket-row small{font-size:9.5px!important;line-height:1.2!important}
+  .ticket-price{font-size:12px!important}
+  .checkout-button span{font-size:10px!important}
+  .checkout-button strong{font-size:16px!important}
+  .table-button{font-size:10px!important}
+  .table-button small{font-size:6.5px!important}
+}
+
 @media(max-width:560px){
   .rk-minus-button,.rk-line-actions .remove-item{width:42px;height:42px;min-width:42px}
   .ticket-row{column-gap:7px!important}
