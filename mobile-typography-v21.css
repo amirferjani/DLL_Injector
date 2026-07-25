@@ -1,0 +1,62 @@
+/*
+ * v21: herstel van de nette v18-layout met uitsluitend een kleine,
+ * doelgerichte lettervergroting. Dit bestand verandert bewust GEEN:
+ * gridkolommen, DOM-volgorde, paneelhoogtes, scrollstructuur, tafelplan,
+ * zichtbaarheid van functies of positie van knoppen.
+ */
+html.rk-mobile-recovery .product-tile strong{
+  font-size:11.5px!important;
+  line-height:1.2!important;
+}
+html.rk-mobile-recovery .product-tile span{
+  font-size:10.5px!important;
+  line-height:1.15!important;
+}
+html.rk-mobile-recovery .product-tile i{
+  font-size:10px!important;
+}
+html.rk-mobile-recovery .category-button{
+  font-size:9.5px!important;
+  line-height:1.16!important;
+}
+html.rk-mobile-recovery .catalog-tab{
+  font-size:11px!important;
+}
+html.rk-mobile-recovery .product-search input{
+  font-size:11.5px!important;
+}
+html.rk-mobile-recovery .view-switch{
+  font-size:12px!important;
+}
+html.rk-mobile-recovery .voice-live-bar strong{
+  font-size:13px!important;
+}
+html.rk-mobile-recovery .voice-live-bar small{
+  font-size:10.5px!important;
+}
+html.rk-mobile-recovery .voice-action{
+  font-size:12px!important;
+}
+html.rk-mobile-recovery .ticket-row strong{
+  font-size:12.5px!important;
+  line-height:1.2!important;
+}
+html.rk-mobile-recovery .ticket-row small{
+  font-size:9.5px!important;
+  line-height:1.25!important;
+}
+html.rk-mobile-recovery .ticket-price{
+  font-size:12px!important;
+}
+html.rk-mobile-recovery .checkout-button span{
+  font-size:10px!important;
+}
+html.rk-mobile-recovery .checkout-button strong{
+  font-size:16px!important;
+}
+html.rk-mobile-recovery .table-button{
+  font-size:10px!important;
+}
+html.rk-mobile-recovery .table-button small{
+  font-size:6.5px!important;
+}
