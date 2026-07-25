@@ -17,9 +17,9 @@
 @keyframes rk-connection-pulse{50%{opacity:.35;transform:translateY(-50%) scale(.78)}}
 
 /*
- * v21: alleen een bescheiden lettervergroting op aanraaktoestellen.
- * Geen kolommen, kaartposities, knoppenrijen, categorieplaatsing, hoogtes of
- * scrollstructuur worden hier gewijzigd.
+ * v22: de leesbaarheid van de drankkaart staat centraal.
+ * Alleen productnamen, prijzen en drankcategorieën worden duidelijk groter en
+ * zwaarder. De productkolommen, kaart, knoppen en scrollstructuur blijven gelijk.
  */
 @media (hover:none) and (pointer:coarse) and (max-width:900px){
   .view-switch{font-size:12px!important}
@@ -27,11 +27,33 @@
   .voice-live-bar strong{font-size:13px!important}
   .voice-live-bar small{font-size:11px!important}
   .voice-action{font-size:12px!important}
-  .catalog-tab{font-size:11px!important}
+
+  .catalog-tab{
+    font-size:12.5px!important;
+    font-weight:950!important;
+    line-height:1.15!important;
+  }
   .product-search input{font-size:11.5px!important}
-  .category-button{font-size:9.5px!important;line-height:1.15!important}
-  .product-tile strong{font-size:11.5px!important;line-height:1.18!important}
-  .product-tile span{font-size:10.5px!important}
+  .category-button{
+    font-size:12.5px!important;
+    font-weight:950!important;
+    line-height:1.2!important;
+    letter-spacing:0!important;
+    overflow-wrap:anywhere!important;
+  }
+  .product-tile strong{
+    font-size:15px!important;
+    font-weight:950!important;
+    line-height:1.16!important;
+    letter-spacing:-.01em!important;
+    overflow-wrap:anywhere!important;
+  }
+  .product-tile span{
+    font-size:12.5px!important;
+    font-weight:900!important;
+    line-height:1.1!important;
+  }
+
   .ticket-header strong{font-size:15px!important}
   .ticket-row strong{font-size:12.5px!important;line-height:1.2!important}
   .ticket-row small{font-size:9.5px!important;line-height:1.2!important}
