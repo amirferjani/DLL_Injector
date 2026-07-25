@@ -1,0 +1,67 @@
+name: Test v22 drink and category readability
+
+on:
+  push:
+    branches:
+      - feature/drink-category-fonts-v22
+    paths:
+      - interaction-upgrades.css
+      - tests/e2e-v22-drink-category-fonts.mjs
+      - .github/workflows/test-v22-drink-category-fonts.yml
+  pull_request:
+    branches:
+      - master
+    paths:
+      - interaction-upgrades.css
+      - tests/e2e-v22-drink-category-fonts.mjs
+      - .github/workflows/test-v22-drink-category-fonts.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v22-drink-category-fonts-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/drink-category-fonts-v22
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.54.1
+          npx playwright install --with-deps chromium
+
+      - name: Start local website
+        run: |
+          nohup python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/kassa-http.log 2>&1 &
+          for i in {1..30}; do
+            curl -fsS http://127.0.0.1:4173/index.html >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/kassa-http.log
+          exit 1
+
+      - name: Test unchanged layout and larger bold drink text
+        run: node tests/e2e-v22-drink-category-fonts.mjs
+
+      - name: Commit test evidence
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add analysis-test-results || true
+          git commit -m "Record v22 drink and category font test results" || exit 0
+          git push origin HEAD:feature/drink-category-fonts-v22
