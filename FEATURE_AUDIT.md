@@ -9,6 +9,7 @@ Dit document bestaat omdat kassafuncties nooit stilzwijgend mogen verdwijnen. Vo
 - `backup/dll-injector-original-2026-07-24`
 - `backup/pre-full-feature-audit-2026-07-24`
 - `backup/pre-order-controls-offline-2026-07-25`
+- `backup/pre-mobile-readability-v19-2026-07-25`
 
 ## Behouden en aanwezig
 
@@ -46,7 +47,26 @@ Dit document bestaat omdat kassafuncties nooit stilzwijgend mogen verdwijnen. Vo
 - De synchronisatiewachtrij blijft ook bij een serverstoring lokaal bewaard.
 - De serviceworker cachet alle nieuwe v18-bestanden.
 
-## Functies verwijderd in v18
+## V19 toegevoegd zonder bestaande bediening te verwijderen
+
+Na controle van de aangeleverde iPhone-schermafbeelding en de actieve CSS bleek dat de primaire producttekst slechts 10 px was, de prijs 9 px en de categorieën 8–9 px. De eerdere onmiddellijke suggestie om alles naar 16–18 px te vergroten en de plattegrond ongeveer 30% te verkleinen was te grof en is bewust niet uitgevoerd.
+
+V19 doet doelgerichte aanpassingen:
+
+- iPhones worden via toestelkenmerken herkend, ook wanneer Safari een onverwacht brede layoutviewport gebruikt.
+- Een normale iPhone gebruikt 3 productkolommen; een brede iPhone-layout gebruikt maximaal 4 en nooit meer 6.
+- Productnamen worden 13,5 px, prijzen 12 px en tegels minimaal 94 px hoog.
+- Categorieën worden horizontale knoppen van 12 px, zodat zij niet langer een smalle verticale kolom naast de producten vormen.
+- Zoeken en de drie hoofdweergaven krijgen 13 px tekst.
+- De belangrijkste rekeningacties krijgen een 2×2-indeling met aanraakhoogte van minimaal 44 px.
+- `Verplaats` blijft op de telefoon zichtbaar; de functie wordt niet langer door de oude mobiele CSS verborgen.
+- Bestellingsregels krijgen 14 px hoofdtekst, 10,5 px status en grotere aantal-/min-/verwijderbediening.
+- Bestellen en betalen krijgen duidelijkere primaire tekst.
+- Kleine decoratieve labels, legenda en kaartdecoratie blijven compact; er is geen globale vergrotingsfactor toegepast.
+- De plattegrond is niet agressief verkleind, omdat 33 tafels anders te dicht op elkaar zouden komen.
+- Desktop behoudt zijn bestaande dichte productweergave.
+
+## Functies verwijderd in v18 of v19
 
 **Geen.**
 
@@ -72,6 +92,20 @@ Een echte mobiele Chromium/Playwright-test op de volledige webapp bevestigde:
 - geen onverwachte JavaScript-paginafouten.
 
 Zie `docs/TEST_RESULTS_V18.md`.
+
+## Gecontroleerde v19-werking
+
+Een echte browsertest op de volledige webapp bevestigde:
+
+- een iPhone van 390 px krijgt 3 productkolommen;
+- een brede iPhone-layout van 708 px krijgt 4 productkolommen en niet 6;
+- primaire product-, categorie-, zoek-, rekening- en checkouttekst haalt de vastgelegde minimumgroottes;
+- aanraakknoppen blijven minimaal 40–44 px;
+- er is geen horizontale documentoverflow;
+- desktop blijft 5 kolommen gebruiken en wordt niet globaal vergroot;
+- geen onverwachte JavaScript-paginafouten.
+
+Zie `docs/TEST_RESULTS_V19.md`.
 
 ## Grenzen en nog te valideren
 
