@@ -1,0 +1,174 @@
+{
+  "startedAt": "2026-07-25T03:20:19.346Z",
+  "passed": true,
+  "checks": [
+    {
+      "name": "v21 is actief",
+      "ok": true,
+      "details": "21"
+    },
+    {
+      "name": "v19/v20-layout is weg",
+      "ok": true,
+      "details": "false"
+    },
+    {
+      "name": "oude smalle grid blijft 2 kolommen",
+      "ok": true,
+      "details": "2"
+    },
+    {
+      "name": "categorieën zijn niet verplaatst",
+      "ok": true,
+      "details": "order-main"
+    },
+    {
+      "name": "oude catalogustabrij blijft zichtbaar",
+      "ok": true,
+      "details": "flex"
+    },
+    {
+      "name": "producttekst is alleen licht groter",
+      "ok": true,
+      "details": "11.5px"
+    },
+    {
+      "name": "prijs is alleen licht groter",
+      "ok": true,
+      "details": "10.5px"
+    },
+    {
+      "name": "categorie is alleen licht groter",
+      "ok": true,
+      "details": "9.5px"
+    },
+    {
+      "name": "rekeningfuncties blijven bestaan",
+      "ok": true,
+      "details": "[\"Plattegrond\",\"Rekening gevraagd\",\"Verplaats\",\"Historiek\"]"
+    },
+    {
+      "name": "geen horizontale overflow",
+      "ok": true,
+      "details": "390/390"
+    },
+    {
+      "name": "producttik springt niet",
+      "ok": true,
+      "details": "636→636"
+    },
+    {
+      "name": "producttik kiest geen andere tafel",
+      "ok": true,
+      "details": "K3→K3"
+    },
+    {
+      "name": "product wordt één keer toegevoegd",
+      "ok": true,
+      "details": "1"
+    },
+    {
+      "name": "min en kruis blijven",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "historiek blijft",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "oude brede grid blijft 3 kolommen",
+      "ok": true,
+      "details": "3"
+    },
+    {
+      "name": "brede categorieën zijn niet verplaatst",
+      "ok": true,
+      "details": "order-main"
+    },
+    {
+      "name": "brede iPhone heeft geen overflow",
+      "ok": true,
+      "details": "708/708"
+    },
+    {
+      "name": "desktop krijgt geen mobiele code",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "desktop blijft 5 kolommen",
+      "ok": true,
+      "details": "5"
+    },
+    {
+      "name": "desktopfont blijft 10px",
+      "ok": true,
+      "details": "10px"
+    },
+    {
+      "name": "geen JavaScript-fouten",
+      "ok": true,
+      "details": ""
+    }
+  ],
+  "errors": [],
+  "metrics": {
+    "iphone390": {
+      "version": "21",
+      "broken": false,
+      "columns": 2,
+      "name": "11.5px",
+      "price": "10.5px",
+      "category": "9.5px",
+      "rail": "order-main",
+      "tabs": "flex",
+      "width": 390,
+      "scrollWidth": 390,
+      "actions": [
+        "Plattegrond",
+        "Rekening gevraagd",
+        "Verplaats",
+        "Historiek"
+      ]
+    },
+    "iphone708": {
+      "version": "21",
+      "broken": false,
+      "columns": 3,
+      "name": "11.5px",
+      "price": "10.5px",
+      "category": "9.5px",
+      "rail": "order-main",
+      "tabs": "flex",
+      "width": 708,
+      "scrollWidth": 708,
+      "actions": [
+        "Plattegrond",
+        "Rekening gevraagd",
+        "Verplaats",
+        "Historiek"
+      ]
+    },
+    "desktop": {
+      "version": "",
+      "broken": false,
+      "columns": 5,
+      "name": "10px",
+      "price": "9px",
+      "category": "9px",
+      "rail": "order-main",
+      "tabs": "flex",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "actions": [
+        "Plattegrond",
+        "Rekening gevraagd",
+        "Verplaats",
+        "Historiek"
+      ]
+    }
+  },
+  "finishedAt": "2026-07-25T03:20:22.707Z"
+}
