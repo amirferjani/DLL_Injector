@@ -17,6 +17,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: v20-mobile-order-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   e2e:
     runs-on: ubuntu-latest
@@ -56,7 +60,7 @@ jobs:
         if: always()
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "41898278+github-actions[bot]@users.noreply.github.com"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add analysis-test-results || true
           git commit -m "Record v20 mobile ordering test results" || exit 0
           git push origin HEAD:feature/mobile-order-v20
