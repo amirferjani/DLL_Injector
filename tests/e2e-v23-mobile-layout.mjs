@@ -18,14 +18,6 @@ function check(name, ok, details = '') {
   if (!ok) throw new Error(`${name}${details ? `: ${details}` : ''}`);
 }
 
-async function visible(locator) {
-  return locator.evaluate(element => {
-    const style = getComputedStyle(element);
-    const rect = element.getBoundingClientRect();
-    return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
-  });
-}
-
 async function openOrder(page) {
   await page.goto(`${baseUrl}/?test=mobile-layout-v23`, { waitUntil: 'domcontentloaded' });
   await page.locator('#staffGrid .staff-card').first().waitFor({ timeout: 20000 });
@@ -114,11 +106,14 @@ try {
   check('Geen horizontale documentoverflow', metrics.documentScrollWidth <= metrics.documentWidth + 1, `${metrics.documentScrollWidth}/${metrics.documentWidth}`);
 
   const firstTile = phone.locator('.product-tile').first();
+  await firstTile.scrollIntoViewIfNeeded();
+  await phone.waitForTimeout(120);
   const beforeScroll = await phone.evaluate(() => window.scrollY);
   await firstTile.click();
   await phone.locator('#ticketList .ticket-row').first().waitFor({ timeout: 10000 });
+  await phone.waitForTimeout(180);
   const afterScroll = await phone.evaluate(() => window.scrollY);
-  check('Product kan toegevoegd worden zonder naar de plattegrond te springen', Math.abs(afterScroll - beforeScroll) < 80, `${beforeScroll} -> ${afterScroll}`);
+  check('Product kan toegevoegd worden zonder terug naar de plattegrond te springen', Math.abs(afterScroll - beforeScroll) < 80, `${beforeScroll} -> ${afterScroll}`);
 
   const qtyBefore = await phone.locator('#ticketList .qty-button').first().textContent();
   const productContent = phone.locator('#ticketList .ticket-row > div').filter({ has: phone.locator('strong') }).first();
