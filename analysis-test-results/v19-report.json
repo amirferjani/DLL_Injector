@@ -1,0 +1,171 @@
+{
+  "startedAt": "2026-07-25T00:46:45.319Z",
+  "passed": true,
+  "checks": [
+    {
+      "name": "iPhone wordt onafhankelijk van de layoutviewport als telefoon herkend",
+      "ok": true,
+      "details": "phone"
+    },
+    {
+      "name": "390px iPhone gebruikt drie leesbare productkolommen",
+      "ok": true,
+      "details": "kolommen=3"
+    },
+    {
+      "name": "Productnaam is primair en minstens 13px",
+      "ok": true,
+      "details": "13.5px"
+    },
+    {
+      "name": "Productprijs is minstens 11.5px",
+      "ok": true,
+      "details": "12px"
+    },
+    {
+      "name": "Producttegel is minstens 90px hoog",
+      "ok": true,
+      "details": "94"
+    },
+    {
+      "name": "Categorieën zijn horizontale knoppen",
+      "ok": true,
+      "details": "flex/auto"
+    },
+    {
+      "name": "Categorietekst is minstens 12px",
+      "ok": true,
+      "details": "12px"
+    },
+    {
+      "name": "Zoekveld is minstens 13px",
+      "ok": true,
+      "details": "13px"
+    },
+    {
+      "name": "Belangrijke weergaveknoppen zijn minstens 13px",
+      "ok": true,
+      "details": "13px"
+    },
+    {
+      "name": "Rekeningacties zijn minstens 12px",
+      "ok": true,
+      "details": "12.5px"
+    },
+    {
+      "name": "Telefoonpagina heeft geen horizontale documentoverflow",
+      "ok": true,
+      "details": "390/390"
+    },
+    {
+      "name": "Bestellingsregel heeft minstens 14px hoofdtekst",
+      "ok": true,
+      "details": "14px"
+    },
+    {
+      "name": "Bestellingsregel heeft minstens 10px statustekst",
+      "ok": true,
+      "details": "10.5px"
+    },
+    {
+      "name": "Minbediening blijft een grote aanraakknop",
+      "ok": true,
+      "details": "42"
+    },
+    {
+      "name": "Bestelknop blijft duidelijk leesbaar",
+      "ok": true,
+      "details": "17px"
+    },
+    {
+      "name": "Brede iPhone-layout blijft als telefoon geclassificeerd",
+      "ok": true,
+      "details": "phone"
+    },
+    {
+      "name": "Brede iPhone gebruikt maximaal vier en nooit zes productkolommen",
+      "ok": true,
+      "details": "kolommen=4"
+    },
+    {
+      "name": "Brede iPhone houdt dezelfde leesbare producttekst",
+      "ok": true,
+      "details": "13.5px"
+    },
+    {
+      "name": "Brede iPhone heeft geen horizontale documentoverflow",
+      "ok": true,
+      "details": "708/708"
+    },
+    {
+      "name": "Desktop krijgt de telefoonklasse niet",
+      "ok": true,
+      "details": "desktop"
+    },
+    {
+      "name": "Desktopdichtheid blijft behouden en wordt niet globaal vergroot",
+      "ok": true,
+      "details": "kolommen=5"
+    },
+    {
+      "name": "Geen onverwachte JavaScript-paginafouten",
+      "ok": true,
+      "details": ""
+    }
+  ],
+  "browserErrors": [],
+  "metrics": {
+    "iphone390": {
+      "device": "phone",
+      "columns": 3,
+      "tileHeight": 94,
+      "tileNameFont": "13.5px",
+      "tilePriceFont": "12px",
+      "categoryDisplay": "flex",
+      "categoryOverflowX": "auto",
+      "categoryFont": "12px",
+      "searchFont": "13px",
+      "viewFont": "13px",
+      "orderActionFont": "12.5px",
+      "documentWidth": 390,
+      "documentScrollWidth": 390
+    },
+    "ticket": {
+      "primary": "14px",
+      "secondary": "10.5px",
+      "minusSize": 42,
+      "checkout": "17px"
+    },
+    "iphone708": {
+      "device": "phone",
+      "columns": 4,
+      "tileHeight": 94,
+      "tileNameFont": "13.5px",
+      "tilePriceFont": "12px",
+      "categoryDisplay": "flex",
+      "categoryOverflowX": "auto",
+      "categoryFont": "12px",
+      "searchFont": "13px",
+      "viewFont": "13px",
+      "orderActionFont": "12.5px",
+      "documentWidth": 708,
+      "documentScrollWidth": 708
+    },
+    "desktop": {
+      "device": "desktop",
+      "columns": 5,
+      "tileHeight": 76,
+      "tileNameFont": "10px",
+      "tilePriceFont": "9px",
+      "categoryDisplay": "block",
+      "categoryOverflowX": "auto",
+      "categoryFont": "9px",
+      "searchFont": "10px",
+      "viewFont": "12px",
+      "orderActionFont": "16px",
+      "documentWidth": 1440,
+      "documentScrollWidth": 1440
+    }
+  },
+  "finishedAt": "2026-07-25T00:46:50.652Z"
+}
