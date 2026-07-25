@@ -14,7 +14,7 @@
 - ✅ Favorieten, Alle producten en Recent blijven zichtbaar — flex
 - ✅ Plattegrondhoogte is niet veranderd — hoogte=500
 - ✅ Geen horizontale documentoverflow — 390/390
-- ✅ Producttik springt niet naar de kaart — 364→364
+- ✅ Producttik springt niet naar de kaart — 362→362
 - ✅ Producttik verandert de tafel niet — K3→K3
 - ✅ Producttik voegt exact één toe — qty=1
 - ✅ Brede iPhone behoudt de oorspronkelijke drie productkolommen — kolommen=3
