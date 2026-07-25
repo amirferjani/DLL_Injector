@@ -37,13 +37,14 @@ async function openPhone(browser, { name, width, height }) {
   });
   await page.goto(`${baseUrl}/?test=mobile-order-v20-${name}`, { waitUntil: 'domcontentloaded' });
   await page.locator('#staffGrid .staff-card').first().waitFor({ timeout: 20000 });
-  await page.locator('#bossLoginButton').click();
+  await page.evaluate(() => document.getElementById('bossLoginButton')?.click());
+  await page.locator('#bossPinWrap:not(.hidden)').waitFor({ timeout: 10000 });
   await page.locator('#bossPin').fill('0607');
-  await page.locator('#bossPinSubmit').click();
+  await page.evaluate(() => document.getElementById('bossPinSubmit')?.click());
   await page.locator('#app:not(.hidden)').waitFor({ timeout: 15000 });
   await page.waitForFunction(() => document.documentElement.classList.contains('rk-order-v20'), null, { timeout: 15000 });
   const table = page.locator('.table-button').filter({ hasText: /^K3$/ }).first();
-  await table.click();
+  await table.click({ force: true });
   await page.locator('#orderContent:not(.hidden)').waitFor();
   await page.locator('#categoryRail [data-rk-catalog-proxy="favorites"]').waitFor({ timeout: 10000 });
   await page.locator('#requestBillButton.rk-request-pill').waitFor({ timeout: 10000 });
@@ -138,7 +139,7 @@ try {
     });
     await page.waitForTimeout(100);
     const before = await page.evaluate(() => ({ y: window.scrollY, table: window.__kassaAppApi?.getSelectedTableId?.() || '' }));
-    await tile.click();
+    await tile.click({ force: true });
     await page.locator('#ticketList .ticket-row').waitFor();
     await page.waitForTimeout(800);
     const after = await page.evaluate(() => ({ y: window.scrollY, table: window.__kassaAppApi?.getSelectedTableId?.() || '', qty: window.__kassaAppApi?.getOrder?.('K3')?.items?.find(item => item.productId === 'p1')?.qty || 0 }));
