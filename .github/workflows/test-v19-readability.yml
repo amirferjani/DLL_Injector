@@ -1,0 +1,60 @@
+name: Test v19 mobile readability
+
+on:
+  push:
+    branches:
+      - feature/mobile-readability-v19
+    paths:
+      - .github/workflows/test-v19-readability.yml
+      - tests/e2e-v19-readability.mjs
+      - interaction-upgrades.css
+      - connection-manager.js
+      - sw.js
+      - reset-kassa.html
+
+permissions:
+  contents: write
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/mobile-readability-v19
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.54.1
+          npx playwright install --with-deps chromium
+
+      - name: Start local web server
+        run: |
+          nohup python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/kassa-http.log 2>&1 &
+          echo $! > /tmp/kassa-http.pid
+          for i in {1..30}; do
+            curl -fsS http://127.0.0.1:4173/index.html >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/kassa-http.log
+          exit 1
+
+      - name: Run iPhone and desktop readability tests
+        run: node tests/e2e-v19-readability.mjs
+
+      - name: Commit test evidence
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add analysis-test-results || true
+          git commit -m "Record v19 mobile readability test results" || exit 0
+          git push origin HEAD:feature/mobile-readability-v19
