@@ -1,0 +1,222 @@
+{
+  "startedAt": "2026-07-25T03:08:53.431Z",
+  "passed": true,
+  "checks": [
+    {
+      "name": "V21 mobiele herstelcode is actief",
+      "ok": true,
+      "details": "21"
+    },
+    {
+      "name": "Mislukte v19/v20-layoutklassen zijn niet actief",
+      "ok": true,
+      "details": "false"
+    },
+    {
+      "name": "Oorspronkelijke productgridstructuur blijft behouden",
+      "ok": true,
+      "details": "kolommen=2"
+    },
+    {
+      "name": "Categorieën blijven links in de oorspronkelijke order-main",
+      "ok": true,
+      "details": "order-main"
+    },
+    {
+      "name": "Oorspronkelijke catalogustabrij blijft zichtbaar",
+      "ok": true,
+      "details": "flex"
+    },
+    {
+      "name": "Productnaam is slechts licht vergroot",
+      "ok": true,
+      "details": "11.5px"
+    },
+    {
+      "name": "Prijs is slechts licht vergroot",
+      "ok": true,
+      "details": "10.5px"
+    },
+    {
+      "name": "Categorietekst is slechts licht vergroot",
+      "ok": true,
+      "details": "9.5px"
+    },
+    {
+      "name": "Bestaande rekeningacties zijn niet uit de DOM verwijderd",
+      "ok": true,
+      "details": "[{\"id\":\"backFloorButton\",\"text\":\"Plattegrond\",\"display\":\"block\"},{\"id\":\"requestBillButton\",\"text\":\"Rekening gevraagd\",\"display\":\"block\"},{\"id\":\"moveTableButton\",\"text\":\"Verplaats\",\"display\":\"none\"},{\"id\":\"\",\"text\":\"Historiek\",\"display\":\"block\"}]"
+    },
+    {
+      "name": "Geen horizontale documentoverflow",
+      "ok": true,
+      "details": "390/390"
+    },
+    {
+      "name": "Producttik behoudt de scrollpositie",
+      "ok": true,
+      "details": "638→638"
+    },
+    {
+      "name": "Producttik verandert de gekozen tafel niet",
+      "ok": true,
+      "details": "K3→K3"
+    },
+    {
+      "name": "Producttik voegt het product exact één keer toe",
+      "ok": true,
+      "details": "qty=1"
+    },
+    {
+      "name": "Minteken en kruis blijven aanwezig",
+      "ok": true,
+      "details": "min/x"
+    },
+    {
+      "name": "Historiekfunctie blijft voor de Baas aanwezig",
+      "ok": true,
+      "details": "historiek"
+    },
+    {
+      "name": "Brede iPhone behoudt de oorspronkelijke drie kolommen",
+      "ok": true,
+      "details": "kolommen=3"
+    },
+    {
+      "name": "Brede iPhone behoudt oorspronkelijke categorieplaatsing",
+      "ok": true,
+      "details": "order-main"
+    },
+    {
+      "name": "Brede iPhone heeft geen horizontale documentoverflow",
+      "ok": true,
+      "details": "708/708"
+    },
+    {
+      "name": "Desktop krijgt geen mobiele herstelklasse",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "Desktop behoudt de bestaande vijf productkolommen",
+      "ok": true,
+      "details": "kolommen=5"
+    },
+    {
+      "name": "Desktoplettergrootte blijft ongewijzigd",
+      "ok": true,
+      "details": "10px"
+    },
+    {
+      "name": "Geen onverwachte JavaScript-paginafouten",
+      "ok": true,
+      "details": ""
+    }
+  ],
+  "browserErrors": [],
+  "metrics": {
+    "iphone390": {
+      "mobileVersion": "21",
+      "hasBrokenV19": false,
+      "columns": 2,
+      "tileName": "11.5px",
+      "tilePrice": "10.5px",
+      "categoryFont": "9.5px",
+      "railParent": "order-main",
+      "tabsDisplay": "flex",
+      "actionButtons": [
+        {
+          "id": "backFloorButton",
+          "text": "Plattegrond",
+          "display": "block"
+        },
+        {
+          "id": "requestBillButton",
+          "text": "Rekening gevraagd",
+          "display": "block"
+        },
+        {
+          "id": "moveTableButton",
+          "text": "Verplaats",
+          "display": "none"
+        },
+        {
+          "id": "",
+          "text": "Historiek",
+          "display": "block"
+        }
+      ],
+      "docWidth": 390,
+      "scrollWidth": 390
+    },
+    "iphone708": {
+      "mobileVersion": "21",
+      "hasBrokenV19": false,
+      "columns": 3,
+      "tileName": "11.5px",
+      "tilePrice": "10.5px",
+      "categoryFont": "9.5px",
+      "railParent": "order-main",
+      "tabsDisplay": "flex",
+      "actionButtons": [
+        {
+          "id": "backFloorButton",
+          "text": "Plattegrond",
+          "display": "block"
+        },
+        {
+          "id": "requestBillButton",
+          "text": "Rekening gevraagd",
+          "display": "block"
+        },
+        {
+          "id": "moveTableButton",
+          "text": "Verplaats",
+          "display": "none"
+        },
+        {
+          "id": "",
+          "text": "Historiek",
+          "display": "block"
+        }
+      ],
+      "docWidth": 708,
+      "scrollWidth": 708
+    },
+    "desktop": {
+      "mobileVersion": "",
+      "hasBrokenV19": false,
+      "columns": 5,
+      "tileName": "10px",
+      "tilePrice": "9px",
+      "categoryFont": "9px",
+      "railParent": "order-main",
+      "tabsDisplay": "flex",
+      "actionButtons": [
+        {
+          "id": "backFloorButton",
+          "text": "Plattegrond",
+          "display": "block"
+        },
+        {
+          "id": "requestBillButton",
+          "text": "Rekening gevraagd",
+          "display": "block"
+        },
+        {
+          "id": "moveTableButton",
+          "text": "Verplaats",
+          "display": "block"
+        },
+        {
+          "id": "",
+          "text": "Historiek",
+          "display": "block"
+        }
+      ],
+      "docWidth": 1440,
+      "scrollWidth": 1440
+    }
+  },
+  "finishedAt": "2026-07-25T03:08:58.860Z"
+}
