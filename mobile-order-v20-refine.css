@@ -1,0 +1,73 @@
+/* v20 refinement: keep Rechnung feature as a compact pill and reserve the
+   three large action cards for Plattegrond, Verplaats and Historiek. */
+html.rk-phone.rk-order-v20 .order-head{
+  grid-template-columns:minmax(118px,.82fr) minmax(0,1.18fr)!important;
+  align-items:stretch!important;
+  column-gap:10px!important;
+}
+html.rk-phone.rk-order-v20 .order-head>div:first-child{
+  min-width:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+}
+html.rk-phone.rk-order-v20 .order-head-actions{
+  display:flex!important;
+  align-items:stretch!important;
+  gap:7px!important;
+  min-width:0!important;
+  width:100%!important;
+}
+html.rk-phone.rk-order-v20 .order-head-actions .soft-button,
+html.rk-phone.rk-order-v20 .order-head-actions .order-history-button{
+  flex:1 1 0!important;
+  width:auto!important;
+  min-width:0!important;
+  min-height:62px!important;
+  padding:7px 4px!important;
+  font-size:10.5px!important;
+}
+html.rk-phone.rk-order-v20 #requestBillButton.rk-request-pill{
+  display:inline-flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  width:auto!important;
+  min-width:0!important;
+  min-height:30px!important;
+  margin-top:8px!important;
+  padding:5px 9px!important;
+  border-radius:999px!important;
+  border:1px solid rgba(255,255,255,.1)!important;
+  background:#172741!important;
+  color:#dbe5f4!important;
+  font-size:10px!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+}
+html.rk-phone.rk-order-v20 #requestBillButton.rk-request-pill::before{
+  content:'€'!important;
+  display:inline!important;
+  font-size:11px!important;
+  color:#f5b3d4!important;
+}
+html.rk-phone.rk-order-v20 #requestBillButton.rk-request-pill.active{
+  border-color:rgba(255,90,165,.45)!important;
+  background:rgba(105,39,78,.72)!important;
+  color:#fff!important;
+}
+@media(max-width:360px){
+  html.rk-phone.rk-order-v20 .order-head{
+    grid-template-columns:minmax(104px,.72fr) minmax(0,1.28fr)!important;
+    column-gap:7px!important;
+    padding-inline:10px!important;
+  }
+  html.rk-phone.rk-order-v20 .order-head-actions{gap:5px!important}
+  html.rk-phone.rk-order-v20 .order-head-actions .soft-button,
+  html.rk-phone.rk-order-v20 .order-head-actions .order-history-button{
+    min-height:58px!important;
+    font-size:9.5px!important;
+  }
+}
