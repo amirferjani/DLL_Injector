@@ -1,0 +1,61 @@
+name: Test v23 balanced mobile layout
+
+on:
+  push:
+    branches:
+      - feature/mobile-layout-v23
+    paths:
+      - mobile-layout-v23.css
+      - mobile-layout-v23.js
+      - connection-manager.js
+      - sw.js
+      - reset-kassa.html
+      - tests/e2e-v23-mobile-layout.mjs
+      - .github/workflows/test-v23-mobile-layout.yml
+
+permissions:
+  contents: write
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/mobile-layout-v23
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.54.1
+          npx playwright install --with-deps chromium
+
+      - name: Start local web server
+        run: |
+          nohup python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/kassa-http.log 2>&1 &
+          echo $! > /tmp/kassa-http.pid
+          for i in {1..30}; do
+            curl -fsS http://127.0.0.1:4173/index.html >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/kassa-http.log
+          exit 1
+
+      - name: Run iPhone and desktop layout test
+        run: node tests/e2e-v23-mobile-layout.mjs
+
+      - name: Commit test evidence
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add analysis-test-results || true
+          git commit -m "Record v23 mobile layout test results" || exit 0
+          git push origin HEAD:feature/mobile-layout-v23
