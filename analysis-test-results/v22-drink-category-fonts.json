@@ -1,0 +1,168 @@
+{
+  "startedAt": "2026-07-25T04:01:37.953Z",
+  "passed": true,
+  "checks": [
+    {
+      "name": "Smalle iPhone behoudt de oorspronkelijke twee productkolommen",
+      "ok": true,
+      "details": "kolommen=2"
+    },
+    {
+      "name": "Producttegels behouden vrijwel dezelfde hoogte",
+      "ok": true,
+      "details": "hoogte=82"
+    },
+    {
+      "name": "Dranknamen zijn duidelijk groter",
+      "ok": true,
+      "details": "15px"
+    },
+    {
+      "name": "Dranknamen zijn extra vet",
+      "ok": true,
+      "details": "950"
+    },
+    {
+      "name": "Prijzen zijn duidelijker leesbaar",
+      "ok": true,
+      "details": "12.5px"
+    },
+    {
+      "name": "Prijzen zijn vet",
+      "ok": true,
+      "details": "900"
+    },
+    {
+      "name": "Drankcategorieën zijn duidelijk groter",
+      "ok": true,
+      "details": "12.5px"
+    },
+    {
+      "name": "Drankcategorieën zijn extra vet",
+      "ok": true,
+      "details": "950"
+    },
+    {
+      "name": "Categorieën staan nog steeds links in order-main",
+      "ok": true,
+      "details": "order-main"
+    },
+    {
+      "name": "Favorieten, Alle producten en Recent blijven zichtbaar",
+      "ok": true,
+      "details": "flex"
+    },
+    {
+      "name": "Plattegrondhoogte is niet veranderd",
+      "ok": true,
+      "details": "hoogte=500"
+    },
+    {
+      "name": "Geen horizontale documentoverflow",
+      "ok": true,
+      "details": "390/390"
+    },
+    {
+      "name": "Producttik springt niet naar de kaart",
+      "ok": true,
+      "details": "364→364"
+    },
+    {
+      "name": "Producttik verandert de tafel niet",
+      "ok": true,
+      "details": "K3→K3"
+    },
+    {
+      "name": "Producttik voegt exact één toe",
+      "ok": true,
+      "details": "qty=1"
+    },
+    {
+      "name": "Brede iPhone behoudt de oorspronkelijke drie productkolommen",
+      "ok": true,
+      "details": "kolommen=3"
+    },
+    {
+      "name": "Brede iPhone gebruikt dezelfde grote, vette dranknamen",
+      "ok": true,
+      "details": "15px/950"
+    },
+    {
+      "name": "Brede iPhone gebruikt dezelfde grote, vette categorieën",
+      "ok": true,
+      "details": "12.5px/950"
+    },
+    {
+      "name": "Brede iPhone heeft geen horizontale overflow",
+      "ok": true,
+      "details": "708/708"
+    },
+    {
+      "name": "Desktop behoudt vijf productkolommen",
+      "ok": true,
+      "details": "kolommen=5"
+    },
+    {
+      "name": "Desktoptypografie blijft ongewijzigd",
+      "ok": true,
+      "details": "10px/9px"
+    },
+    {
+      "name": "Geen onverwachte JavaScript-fouten",
+      "ok": true,
+      "details": ""
+    }
+  ],
+  "errors": [],
+  "metrics": {
+    "iphone390": {
+      "columns": 2,
+      "tileHeight": 82,
+      "productFont": "15px",
+      "productWeight": "950",
+      "priceFont": "12.5px",
+      "priceWeight": "900",
+      "categoryFont": "12.5px",
+      "categoryWeight": "950",
+      "categoryLineHeight": "15px",
+      "railParent": "order-main",
+      "tabsDisplay": "flex",
+      "floorHeight": 500,
+      "docWidth": 390,
+      "scrollWidth": 390
+    },
+    "iphone708": {
+      "columns": 3,
+      "tileHeight": 82,
+      "productFont": "15px",
+      "productWeight": "950",
+      "priceFont": "12.5px",
+      "priceWeight": "900",
+      "categoryFont": "12.5px",
+      "categoryWeight": "950",
+      "categoryLineHeight": "15px",
+      "railParent": "order-main",
+      "tabsDisplay": "flex",
+      "floorHeight": 500,
+      "docWidth": 708,
+      "scrollWidth": 708
+    },
+    "desktop": {
+      "columns": 5,
+      "tileHeight": 76,
+      "productFont": "10px",
+      "productWeight": "700",
+      "priceFont": "9px",
+      "priceWeight": "850",
+      "categoryFont": "9px",
+      "categoryWeight": "850",
+      "categoryLineHeight": "normal",
+      "railParent": "order-main",
+      "tabsDisplay": "flex",
+      "floorHeight": 736,
+      "docWidth": 1440,
+      "scrollWidth": 1440
+    }
+  },
+  "finishedAt": "2026-07-25T04:01:41.527Z"
+}
