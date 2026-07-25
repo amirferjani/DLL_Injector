@@ -1,0 +1,9 @@
+{
+  "startedAt": "2026-07-25T01:11:18.554Z",
+  "passed": false,
+  "checks": [],
+  "browserErrors": [],
+  "metrics": {},
+  "failure": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('#orderContent:not(.hidden)') to be visible\n\n    at openPhone (/home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v20-mobile-order.mjs:47:52)\n    at async file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v20-mobile-order.mjs:100:31",
+  "finishedAt": "2026-07-25T01:11:49.090Z"
+}
