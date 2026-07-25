@@ -1,6 +1,30 @@
 (()=>{
   'use strict';
 
+  function classifyDevice(){
+    const root=document.documentElement;
+    const ua=String(navigator.userAgent||'');
+    const touchPoints=Number(navigator.maxTouchPoints||0);
+    const isIPhone=/iPhone|iPod/i.test(ua);
+    const isIPad=/iPad/i.test(ua)||(navigator.platform==='MacIntel'&&touchPoints>1);
+    const coarse=Boolean(window.matchMedia?.('(pointer: coarse)').matches);
+    const screenWidth=Number(window.screen?.width)||window.innerWidth||1024;
+    const screenHeight=Number(window.screen?.height)||window.innerHeight||1024;
+    const shortSide=Math.min(screenWidth,screenHeight);
+    const phone=isIPhone||(!isIPad&&coarse&&shortSide<=600);
+    const tablet=isIPad||(!phone&&coarse&&shortSide<=1180);
+    root.classList.toggle('rk-phone',phone);
+    root.classList.toggle('rk-tablet',tablet);
+    root.classList.toggle('rk-desktop',!phone&&!tablet);
+    root.dataset.rkDevice=phone?'phone':tablet?'tablet':'desktop';
+    const visualWidth=Math.round(window.visualViewport?.width||window.innerWidth||screenWidth);
+    root.style.setProperty('--rk-visual-width',`${visualWidth}px`);
+  }
+
+  classifyDevice();
+  window.addEventListener('orientationchange',()=>setTimeout(classifyDevice,120),{passive:true});
+  window.visualViewport?.addEventListener('resize',classifyDevice,{passive:true});
+
   const api=window.__kassaAppApi;
   if(!api) {
     console.warn('Verbindingsbeheer kon niet starten: app-koppeling ontbreekt.');
@@ -166,6 +190,7 @@
     sync:()=>wakeSync('handmatig'),
     health:healthCheck,
     pending:pendingCounts,
-    state:syncState
+    state:syncState,
+    classifyDevice
   };
 })();
