@@ -1,5 +1,5 @@
 {
-  "startedAt": "2026-07-25T12:44:41.101Z",
+  "startedAt": "2026-07-25T12:47:48.995Z",
   "passed": false,
   "checks": [
     {
@@ -53,9 +53,14 @@
       "details": "402/402"
     },
     {
-      "name": "Product kan toegevoegd worden zonder naar de plattegrond te springen",
+      "name": "Product kan toegevoegd worden zonder terug naar de plattegrond te springen",
+      "ok": true,
+      "details": "632 -> 591"
+    },
+    {
+      "name": "Bestaande dubbele-tikfunctie blijft werken",
       "ok": false,
-      "details": "0 -> 593"
+      "details": "1× -> 1×"
     }
   ],
   "browserErrors": [],
@@ -86,6 +91,6 @@
       "documentScrollWidth": 402
     }
   },
-  "failure": "Error: Product kan toegevoegd worden zonder naar de plattegrond te springen: 0 -> 593\n    at check (file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v23-mobile-layout.mjs:18:18)\n    at file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v23-mobile-layout.mjs:121:3",
-  "finishedAt": "2026-07-25T12:44:41.791Z"
+  "failure": "Error: Bestaande dubbele-tikfunctie blijft werken: 1× -> 1×\n    at check (file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v23-mobile-layout.mjs:18:18)\n    at file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v23-mobile-layout.mjs:123:3",
+  "finishedAt": "2026-07-25T12:47:50.562Z"
 }

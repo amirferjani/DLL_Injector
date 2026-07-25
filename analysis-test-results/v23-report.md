@@ -12,12 +12,13 @@
 - ✅ Microfoonknop blijft zichtbaar — voiceButton
 - ✅ Rekeningacties staan naast elkaar en verdwijnen niet — ["Plattegrond","Rekening gevraagd","Verplaats"]
 - ✅ Geen horizontale documentoverflow — 402/402
-- ❌ Product kan toegevoegd worden zonder naar de plattegrond te springen — 0 -> 593
+- ✅ Product kan toegevoegd worden zonder terug naar de plattegrond te springen — 632 -> 591
+- ❌ Bestaande dubbele-tikfunctie blijft werken — 1× -> 1×
 
 ## Fout
 
 ```
-Error: Product kan toegevoegd worden zonder naar de plattegrond te springen: 0 -> 593
+Error: Bestaande dubbele-tikfunctie blijft werken: 1× -> 1×
     at check (file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v23-mobile-layout.mjs:18:18)
-    at file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v23-mobile-layout.mjs:121:3
+    at file:///home/runner/work/DLL_Injector/DLL_Injector/tests/e2e-v23-mobile-layout.mjs:123:3
 ```
