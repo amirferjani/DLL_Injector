@@ -28,6 +28,14 @@
     document.head.appendChild(link);
   }
 
+  function ensureRefinement(){
+    if(document.querySelector('script[data-rk-mobile-order-v20-refine]')) return;
+    const script=document.createElement('script');
+    script.src='mobile-order-v20-refine.js';
+    script.dataset.rkMobileOrderV20Refine='1';
+    document.head.appendChild(script);
+  }
+
   function originalCatalogButton(mode){
     return document.querySelector(`.catalog-tabs .catalog-tab[data-catalog="${mode}"]`);
   }
@@ -83,7 +91,7 @@
   function compactActionLabels(){
     if(!isPhone()) return;
     const request=document.getElementById('requestBillButton');
-    if(request){
+    if(request&&!request.classList.contains('rk-request-pill')){
       const active=request.classList.contains('active')||request.textContent.includes('✓');
       const label=active?'Rekening ✓':'Rekening';
       if(request.textContent!==label) request.textContent=label;
@@ -95,6 +103,7 @@
   function applyReferenceLayout(){
     if(!isPhone()) return false;
     ensureStyle();
+    ensureRefinement();
     root.classList.add('rk-phone','rk-order-v20');
     root.dataset.rkOrderVersion='20';
 
