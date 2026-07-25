@@ -1,4 +1,4 @@
-const CACHE='registratiekassa-zoo-v18';
+const CACHE='registratiekassa-zoo-v19';
 const APP_PARTS=Array.from({length:7},(_,index)=>`./assets/app.full.${String(index+1).padStart(2,'0')}.b64`);
 const FILES=['./','./index.html','./loader.js','./manifest.webmanifest','./icons/icon.svg','./apple-fixes.css','./voice-controller.js','./boss-audit.css','./boss-audit.js','./order-history-addon.js','./interaction-upgrades.css','./order-controls.js','./connection-manager.js','./assets/styles.css.gz.b64',...APP_PARTS];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting())));
