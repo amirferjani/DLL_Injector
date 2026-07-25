@@ -159,3 +159,68 @@
   setInterval(decorateRows,1200);
   decorateRows();
 })();
+
+/* Bewaar uitsluitend de scrollpositie wanneer een producttegel de rekening hertekent. */
+(()=>{
+  'use strict';
+  let lock=null;
+  let timers=[];
+  let lastProductTap=-Infinity;
+
+  const clearTimers=()=>{timers.forEach(clearTimeout);timers=[];};
+  const capture=tile=>{
+    clearTimers();
+    const floor=document.getElementById('floorViewport');
+    const categories=document.getElementById('categoryRail');
+    lock={
+      x:Math.max(0,window.scrollX||0),
+      y:Math.max(0,window.scrollY||document.documentElement.scrollTop||0),
+      floorLeft:Number(floor?.scrollLeft||0),
+      floorTop:Number(floor?.scrollTop||0),
+      categoryLeft:Number(categories?.scrollLeft||0),
+      expires:performance.now()+1000
+    };
+    lastProductTap=performance.now();
+    try{tile?.blur?.();}catch{}
+  };
+  const restore=()=>{
+    const current=lock;
+    if(!current||performance.now()>current.expires){lock=null;return;}
+    const run=()=>{
+      if(lock!==current||performance.now()>current.expires) return;
+      window.scrollTo(current.x,current.y);
+      const floor=document.getElementById('floorViewport');
+      const categories=document.getElementById('categoryRail');
+      if(floor){floor.scrollLeft=current.floorLeft;floor.scrollTop=current.floorTop;}
+      if(categories) categories.scrollLeft=current.categoryLeft;
+    };
+    [0,16,48,100,220,420,720].forEach(delay=>timers.push(setTimeout(run,delay)));
+    timers.push(setTimeout(()=>{if(lock===current) lock=null;},1020));
+  };
+
+  document.addEventListener('pointerdown',event=>{
+    const tile=event.target.closest?.('.product-tile');
+    if(tile) capture(tile);
+  },true);
+  document.addEventListener('touchstart',event=>{
+    const tile=event.target.closest?.('.product-tile');
+    if(tile&&!lock) capture(tile);
+  },{capture:true,passive:true});
+  document.addEventListener('click',event=>{
+    const tile=event.target.closest?.('.product-tile');
+    if(tile){
+      lastProductTap=performance.now();
+      try{tile.blur();}catch{}
+      restore();
+      return;
+    }
+    const table=event.target.closest?.('.table-button');
+    if(table&&performance.now()-lastProductTap<650){
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      restore();
+    }
+  },true);
+  const target=document.getElementById('orderContent')||document.body;
+  new MutationObserver(()=>{if(lock) restore();}).observe(target,{subtree:true,childList:true});
+})();
