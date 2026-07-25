@@ -7,7 +7,7 @@
   let layoutObserver=null;
   let scrollLock=null;
   let restoreTimers=[];
-  let lastProductInteractionAt=0;
+  let lastProductInteractionAt=-Infinity;
 
   function isPhone(){
     const ua=String(navigator.userAgent||'');
